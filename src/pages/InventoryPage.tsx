@@ -27,13 +27,11 @@ const InventoryPage = () => {
     sealStickers: { current: 150, max: 400, name: "封口贴纸" },
   };
 
-  // Calculate available products based on inventory
   const calculateAvailable = () => {
     const milkLimit = Math.floor(inventory.milk.current / inventory.milk.usage);
     const beansLimit = Math.floor(inventory.beans.current / inventory.beans.usage);
     const cupsLimit = Math.min(packaging.hotCups.current, packaging.coldCups.current);
     const lidsLimit = Math.min(packaging.hotLids.current, packaging.coldLids.current);
-    
     return Math.min(milkLimit, beansLimit, cupsLimit, lidsLimit);
   };
 
@@ -55,7 +53,6 @@ const InventoryPage = () => {
   };
 
   const handleSubmitReplenish = () => {
-    // Submit logic here
     alert("临时补货费用50元，将从每周结算自动扣除。已提交后台审核！");
     setShowReplenishDialog(false);
     setReplenishItems({});
@@ -67,90 +64,84 @@ const InventoryPage = () => {
   ];
 
   return (
-    <div className="p-4 pb-24 space-y-4">
+    <div className="p-3 pb-20 space-y-2">
       {/* Header - Store Info & Available Count */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Left - Store Info */}
-        <Card className="glass-card px-4 py-3">
-          <span className="text-base font-bold text-muted-foreground">KAKAGO</span>
-          <div className="flex flex-col mt-1">
+      <div className="grid grid-cols-2 gap-2">
+        <Card className="glass-card px-3 py-2">
+          <span className="text-sm font-bold text-muted-foreground">KAKAGO</span>
+          <div className="flex flex-col">
             <span className="text-xs text-muted-foreground">中关村店</span>
             <span className="text-xs text-muted-foreground">KKG-0012</span>
           </div>
         </Card>
 
-        {/* Right - Available Products */}
-        <Card className={`glass-card px-4 py-3 ${isLowStock ? "border-destructive" : "border-success"}`}>
+        <Card className={`glass-card px-3 py-2 ${isLowStock ? "border-destructive" : "border-success"}`}>
           {isLowStock && (
-            <div className="flex items-center gap-1 text-destructive mb-1">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="flex items-center gap-1 text-destructive">
+              <AlertTriangle className="w-3 h-3" />
               <span className="text-xs font-bold">库存预警</span>
             </div>
           )}
           <p className="text-xs text-muted-foreground">当前可售</p>
           <div className="flex items-baseline">
-            <span className={`text-3xl font-bold ${isLowStock ? "text-destructive" : "text-success"}`}>
+            <span className={`text-2xl font-bold ${isLowStock ? "text-destructive" : "text-success"}`}>
               {availableProducts}
             </span>
-            <span className="text-sm text-muted-foreground ml-1">杯</span>
+            <span className="text-xs text-muted-foreground ml-1">杯</span>
           </div>
-          <p className="text-xs text-muted-foreground/60 mt-1">
-            基于库存原材料最低组合计算
-          </p>
+          <p className="text-[10px] text-muted-foreground/60">基于库存原材料最低组合计算</p>
         </Card>
       </div>
 
       {/* Replenish Buttons */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Left - Weekly Info */}
-        <Card className="glass-card px-4 py-3 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
+      <div className="grid grid-cols-2 gap-2">
+        <Card className="glass-card px-3 py-2 flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-primary" />
           <div>
-            <p className="text-sm font-bold text-foreground">KAKAGO</p>
-            <p className="text-xs text-muted-foreground">每周定时补货</p>
+            <p className="text-xs font-bold text-foreground">KAKAGO</p>
+            <p className="text-[10px] text-muted-foreground">每周定时补货</p>
           </div>
         </Card>
 
-        {/* Right - Emergency Call */}
         <Button 
-          className="touch-target text-base font-bold bg-primary hover:bg-primary/90 h-auto py-3"
+          className="text-sm font-bold bg-primary hover:bg-primary/90 h-auto py-2"
           onClick={() => setShowReplenishDialog(true)}
         >
-          <Phone className="w-5 h-5 mr-1" />
+          <Phone className="w-4 h-4 mr-1" />
           紧急呼叫补货
         </Button>
       </div>
 
       {/* Inventory Details */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          <Package className="w-5 h-5" />
+      <div className="space-y-2">
+        <h2 className="text-sm font-bold flex items-center gap-1">
+          <Package className="w-4 h-4" />
           库存明细
         </h2>
 
         {/* Raw Materials */}
-        <Card className="glass-card p-4">
-          <h3 className="text-sm text-muted-foreground mb-3">原材料</h3>
-          <div className="space-y-4">
+        <Card className="glass-card p-3">
+          <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
+          <div className="space-y-2">
             {Object.values(inventory).map((item) => {
               const status = getStockStatus(item.current, item.max);
               const percentage = (item.current / item.max) * 100;
               return (
-                <div key={item.name} className="space-y-2">
+                <div key={item.name} className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <item.icon className="w-5 h-5 text-muted-foreground" />
-                      <span className="font-medium">{item.name}</span>
+                    <div className="flex items-center gap-1.5">
+                      <item.icon className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">{item.name}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold">{item.current}</span>
-                      <span className="text-muted-foreground text-sm">/ {item.max} {item.unit}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base font-bold">{item.current}</span>
+                      <span className="text-muted-foreground text-xs">/ {item.max} {item.unit}</span>
                       <Badge
                         variant={status.color === "success" ? "default" : status.color === "warning" ? "secondary" : "destructive"}
-                        className={
+                        className={`text-[10px] px-1.5 py-0 ${
                           status.color === "success" ? "bg-success" :
                           status.color === "warning" ? "bg-warning text-warning-foreground" : ""
-                        }
+                        }`}
                       >
                         {status.text}
                       </Badge>
@@ -158,7 +149,7 @@ const InventoryPage = () => {
                   </div>
                   <Progress
                     value={percentage}
-                    className={`h-2 ${
+                    className={`h-1.5 ${
                       status.color === "destructive" ? "[&>div]:bg-destructive" :
                       status.color === "warning" ? "[&>div]:bg-warning" : "[&>div]:bg-success"
                     }`}
@@ -170,19 +161,19 @@ const InventoryPage = () => {
         </Card>
 
         {/* Packaging Materials */}
-        <Card className="glass-card p-4">
-          <h3 className="text-sm text-muted-foreground mb-3">包材</h3>
-          <div className="grid grid-cols-3 gap-2">
+        <Card className="glass-card p-3">
+          <h3 className="text-xs text-muted-foreground mb-2">包材</h3>
+          <div className="grid grid-cols-3 gap-1.5">
             {Object.values(packaging).map((item) => {
               const status = getStockStatus(item.current, item.max);
               const percentage = (item.current / item.max) * 100;
               return (
-                <div key={item.name} className="p-2 rounded-lg bg-secondary/30">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-muted-foreground truncate">{item.name}</span>
+                <div key={item.name} className="p-1.5 rounded bg-secondary/30">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
                     <Badge
                       variant="outline"
-                      className={`text-[10px] px-1 py-0 ${
+                      className={`text-[8px] px-1 py-0 h-3 ${
                         status.color === "destructive" ? "border-destructive text-destructive" :
                         status.color === "warning" ? "border-warning text-warning" : "border-success text-success"
                       }`}
@@ -191,12 +182,12 @@ const InventoryPage = () => {
                     </Badge>
                   </div>
                   <div className="flex items-baseline gap-0.5">
-                    <span className="text-lg font-bold">{item.current}</span>
-                    <span className="text-[10px] text-muted-foreground">/{item.max}</span>
+                    <span className="text-sm font-bold">{item.current}</span>
+                    <span className="text-[8px] text-muted-foreground">/{item.max}</span>
                   </div>
                   <Progress
                     value={percentage}
-                    className={`h-1 mt-1 ${
+                    className={`h-1 mt-0.5 ${
                       status.color === "destructive" ? "[&>div]:bg-destructive" :
                       status.color === "warning" ? "[&>div]:bg-warning" : "[&>div]:bg-success"
                     }`}
@@ -215,44 +206,44 @@ const InventoryPage = () => {
             <DialogTitle>紧急补货申请</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-3 py-4">
+          <div className="space-y-2 py-2">
             {allItems.map((item) => (
-              <div key={item.key} className="flex items-center justify-between p-2 rounded-lg bg-secondary/30">
+              <div key={item.key} className="flex items-center justify-between p-2 rounded bg-secondary/30">
                 <span className="text-sm font-medium">{item.name}</span>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7"
                     onClick={() => handleReplenishChange(item.key, -1)}
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-3 h-3" />
                   </Button>
-                  <span className="w-8 text-center font-bold">{replenishItems[item.key] || 0}</span>
+                  <span className="w-6 text-center font-bold text-sm">{replenishItems[item.key] || 0}</span>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7"
                     onClick={() => handleReplenishChange(item.key, 1)}
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3 h-3" />
                   </Button>
-                  <span className="text-xs text-muted-foreground w-6">{item.unit}</span>
+                  <span className="text-xs text-muted-foreground w-5">{item.unit}</span>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="p-3 rounded-lg bg-warning/10 border border-warning/30">
+          <div className="p-2 rounded bg-warning/10 border border-warning/30">
             <p className="text-sm text-warning font-medium">⚠️ 临时补货费用：¥50</p>
-            <p className="text-xs text-muted-foreground mt-1">费用将从每周结算自动扣除</p>
+            <p className="text-xs text-muted-foreground">费用将从每周结算自动扣除</p>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowReplenishDialog(false)}>
+            <Button variant="outline" size="sm" onClick={() => setShowReplenishDialog(false)}>
               取消
             </Button>
-            <Button onClick={handleSubmitReplenish} className="bg-primary">
+            <Button size="sm" onClick={handleSubmitReplenish} className="bg-primary">
               提交审核
             </Button>
           </DialogFooter>
