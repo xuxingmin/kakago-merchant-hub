@@ -9,7 +9,7 @@ interface Order {
   id: string;
   items: { name: string; qty: number }[];
   status: "pending" | "accepted" | "making" | "ready" | "delivering" | "delivered";
-  orderTime: number; // seconds since ordered
+  orderTime: number;
   riderStatus?: string;
 }
 
@@ -114,26 +114,24 @@ const WorkPage = () => {
           <div className="space-y-3">
             {pendingOrders.map(order => (
               <div key={order.id} className="p-3 rounded-lg bg-warning/10 border border-warning/30">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    {/* Order ID & Time */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-xl font-bold text-primary">#{order.id}</span>
-                      <div className="flex items-center gap-1 text-warning">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">{formatTime(order.orderTime)}</span>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1 text-warning">
+                          <Clock className="w-4 h-4" />
+                          <span className="text-sm font-medium">{formatTime(order.orderTime)}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        共{getTotalQty(order.items)}杯
-                      </Badge>
                     </div>
-                    {/* Product Names */}
                     <p className="text-foreground">{formatItems(order.items)}</p>
                   </div>
                   {!autoAccept && (
                     <Button
                       onClick={() => handleAcceptOrder(order.id)}
-                      className="touch-target bg-primary hover:bg-primary/90 text-lg font-bold px-8 shrink-0"
+                      className="w-28 h-14 bg-warning hover:bg-warning/90 text-warning-foreground text-lg font-bold shrink-0"
                     >
                       接单
                     </Button>
@@ -165,23 +163,23 @@ const WorkPage = () => {
           <div className="space-y-3">
             {makingOrders.map(order => (
               <div key={order.id} className="p-3 rounded-lg bg-primary/10 border border-primary/30">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-lg font-bold text-primary">#{order.id}</span>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        <span className="text-sm">{formatTime(order.orderTime)}</span>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-sm">{formatTime(order.orderTime)}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        共{getTotalQty(order.items)}杯
-                      </Badge>
                     </div>
-                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground">{formatItems(order.items)}</p>
                   </div>
                   <Button
                     onClick={() => handleFinishOrder(order.id)}
-                    className="touch-target bg-success hover:bg-success/90 font-bold px-6 shrink-0"
+                    className="w-28 h-14 bg-primary hover:bg-primary/90 text-lg font-bold shrink-0"
                   >
                     <Check className="w-5 h-5 mr-1" />
                     完成
@@ -213,26 +211,26 @@ const WorkPage = () => {
           <div className="space-y-3">
             {readyOrders.map(order => (
               <div key={order.id} className="p-3 rounded-lg bg-success/10 border border-success/30">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-lg font-bold text-success">#{order.id}</span>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        <span className="text-sm">{formatTime(order.orderTime)}</span>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-sm">{formatTime(order.orderTime)}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        共{getTotalQty(order.items)}杯
-                      </Badge>
                     </div>
-                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground">{formatItems(order.items)}</p>
                   </div>
                   <Button
                     onClick={() => handleCallRider(order.id)}
-                    className="touch-target bg-primary hover:bg-primary/90 font-bold px-6 shrink-0"
+                    className="w-28 h-14 bg-success hover:bg-success/90 text-success-foreground text-lg font-bold shrink-0"
                   >
                     <Truck className="w-5 h-5 mr-1" />
-                    呼叫骑手
+                    取餐
                   </Button>
                 </div>
               </div>
@@ -261,21 +259,21 @@ const WorkPage = () => {
           <div className="space-y-3">
             {deliveringOrders.map(order => (
               <div key={order.id} className="p-3 rounded-lg bg-secondary/50">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-lg font-bold">#{order.id}</span>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        <span className="text-sm">{formatTime(order.orderTime)}</span>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          <span className="text-sm">{formatTime(order.orderTime)}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        共{getTotalQty(order.items)}杯
-                      </Badge>
                     </div>
-                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground">{formatItems(order.items)}</p>
                   </div>
-                  <Badge variant="secondary" className="px-4 py-2 shrink-0">
+                  <Badge variant="secondary" className="w-28 h-14 flex items-center justify-center text-sm shrink-0">
                     {order.riderStatus}
                   </Badge>
                 </div>
