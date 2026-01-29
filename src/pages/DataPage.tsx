@@ -86,30 +86,28 @@ const DataPage = () => {
             <span className="text-xs text-muted-foreground">较昨日</span>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-3">
-            = 营业额50% - 券补贴40%
+            明天比今天会更好！
           </p>
         </Card>
 
         {/* 右上 - 今日营业额 */}
         <Card className="glass-card p-3">
           <p className="text-xs text-muted-foreground mb-1">今日营业额</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-primary">¥{revenue.toLocaleString()}</span>
-            <Badge className="bg-success/20 text-success text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xl font-bold text-primary">¥{revenue.toLocaleString()}</span>
+            <Badge className="bg-success/20 text-success text-xs shrink-0">
               <TrendingUp className="w-3 h-3 mr-0.5" />
               +{revenueChange}%
             </Badge>
           </div>
         </Card>
 
-        {/* 右下 - 核销券金 */}
+        {/* 右下 - 商户补贴 */}
         <Card className="glass-card p-3">
-          <p className="text-xs text-muted-foreground mb-1">核销券金</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-warning">¥{couponTotal.toLocaleString()}</span>
-          </div>
+          <p className="text-xs text-muted-foreground mb-1">商户补贴</p>
+          <span className="text-xl font-bold text-warning">¥{merchantCouponShare.toLocaleString()}</span>
           <p className="text-xs text-muted-foreground/60 mt-1">
-            商户承担: ¥{merchantCouponShare}
+            平台补贴: ¥{(couponTotal * 0.6).toLocaleString()}
           </p>
         </Card>
       </div>
