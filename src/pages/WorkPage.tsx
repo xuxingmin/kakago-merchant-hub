@@ -70,19 +70,20 @@ const WorkPage = () => {
     <div className="p-4 pb-24 space-y-4">
       {/* Compact Banner */}
       <Card className="glass-card px-4 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-base font-bold text-muted-foreground">KAKAGO</span>
-            <span className="text-xs text-muted-foreground">中关村店 · KKG-0012</span>
+        <div className="flex items-center">
+          <span className="text-base font-bold text-muted-foreground mr-4">KAKAGO</span>
+          <div className="flex flex-col">
+            <span className="text-xs text-muted-foreground">中关村店</span>
+            <span className="text-xs text-muted-foreground">KKG-0012</span>
           </div>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <label className="flex items-center gap-1.5 cursor-pointer">
+          <div className="flex items-center gap-3 ml-auto">
+            <label className="flex items-center gap-1 cursor-pointer">
               <Switch checked={isOnline} onCheckedChange={setIsOnline} className="scale-75 data-[state=checked]:bg-primary" />
-              <span className={isOnline ? "text-primary" : ""}>{isOnline ? "营业" : "暂停"}</span>
+              <span className={`text-xs ${isOnline ? "text-foreground" : "text-muted-foreground/50"}`}>{isOnline ? "营业" : "暂停"}</span>
             </label>
-            <label className="flex items-center gap-1.5 cursor-pointer">
+            <label className="flex items-center gap-1 cursor-pointer">
               <Switch checked={autoAccept} onCheckedChange={setAutoAccept} className="scale-75 data-[state=checked]:bg-primary" />
-              <span className={autoAccept ? "text-primary" : ""}>自动</span>
+              <span className={`text-xs ${autoAccept ? "text-foreground" : "text-muted-foreground/50"}`}>自动</span>
             </label>
           </div>
         </div>
