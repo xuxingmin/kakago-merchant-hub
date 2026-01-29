@@ -102,12 +102,15 @@ const DataPage = () => {
           </div>
         </Card>
 
-        {/* 右下 - 商户补贴 */}
+        {/* 右下 - 核销券金 */}
         <Card className="glass-card p-3">
-          <p className="text-xs text-muted-foreground mb-1">商户补贴</p>
+          <p className="text-xs text-muted-foreground mb-1">核销券金</p>
           <span className="text-xl font-bold text-warning">¥{merchantCouponShare.toLocaleString()}</span>
           <p className="text-xs text-muted-foreground/60 mt-1">
             平台补贴: ¥{(couponTotal * 0.6).toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            一起努力获客！
           </p>
         </Card>
       </div>
