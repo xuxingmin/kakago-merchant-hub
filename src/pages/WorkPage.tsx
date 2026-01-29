@@ -25,11 +25,6 @@ const WorkPage = () => {
   const [autoAccept, setAutoAccept] = useState(false);
   const [orders, setOrders] = useState<Order[]>(mockOrders);
 
-  const merchantInfo = {
-    name: "中关村创业大街店",
-    id: "KKG-0012",
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -60,7 +55,7 @@ const WorkPage = () => {
     setOrders(prev =>
       prev.map(o =>
         o.id === orderId
-          ? { ...o, status: "delivering", riderStatus: "呼叫骑手中..." }
+          ? { ...o, status: "delivering", riderStatus: "骑手已取餐" }
           : o
       )
     );
@@ -73,47 +68,22 @@ const WorkPage = () => {
 
   return (
     <div className="p-4 pb-24 space-y-4">
-      {/* Banner Card */}
-      <Card className="glass-card px-4 py-4">
+      {/* Compact Banner */}
+      <Card className="glass-card px-4 py-2">
         <div className="flex items-center justify-between">
-          {/* Left: Logo & Store Info */}
-          <div>
-            <p className="text-xl font-bold text-muted-foreground tracking-wider">KAKAGO</p>
-            <p className="text-sm text-foreground">{merchantInfo.name}</p>
-            <p className="text-xs text-muted-foreground">{merchantInfo.id}</p>
+          <div className="flex items-center gap-3">
+            <span className="text-base font-bold text-muted-foreground">KAKAGO</span>
+            <span className="text-xs text-muted-foreground">中关村店 · KKG-0012</span>
           </div>
-          
-          {/* Right: Switches */}
-          <div className="flex items-center gap-6">
-            {/* Online Status */}
-            <div className="flex items-center gap-3">
-              <Switch
-                checked={isOnline}
-                onCheckedChange={setIsOnline}
-                className="scale-125 data-[state=checked]:bg-primary"
-              />
-              <div className="flex flex-col">
-                <span className={`text-sm font-bold ${isOnline ? "text-primary" : "text-muted-foreground"}`}>
-                  {isOnline ? "正在" : "暂停"}
-                </span>
-                <span className={`text-sm font-bold ${isOnline ? "text-primary" : "text-muted-foreground"}`}>
-                  营业
-                </span>
-              </div>
-            </div>
-            
-            {/* Auto Accept */}
-            <div className="flex items-center gap-3">
-              <Switch
-                checked={autoAccept}
-                onCheckedChange={setAutoAccept}
-                className="scale-125 data-[state=checked]:bg-primary"
-              />
-              <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">自动</span>
-                <span className="text-sm text-muted-foreground">接单</span>
-              </div>
-            </div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <Switch checked={isOnline} onCheckedChange={setIsOnline} className="scale-75 data-[state=checked]:bg-primary" />
+              <span className={isOnline ? "text-primary" : ""}>{isOnline ? "营业" : "暂停"}</span>
+            </label>
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <Switch checked={autoAccept} onCheckedChange={setAutoAccept} className="scale-75 data-[state=checked]:bg-primary" />
+              <span className={autoAccept ? "text-primary" : ""}>自动</span>
+            </label>
           </div>
         </div>
       </Card>
@@ -125,9 +95,7 @@ const WorkPage = () => {
             <Bell className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-bold">新订单</h2>
           </div>
-          <Badge className="bg-primary text-primary-foreground text-lg px-3">
-            {pendingOrders.length}
-          </Badge>
+          <span className="text-2xl font-bold text-foreground">{pendingOrders.length}</span>
         </div>
         
         {pendingOrders.length > 0 ? (
@@ -137,21 +105,18 @@ const WorkPage = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-sm font-medium">{formatTime(order.orderTime)}</span>
-                        </div>
+                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
                         <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
                   </div>
                   {!autoAccept && (
                     <Button
                       onClick={() => handleAcceptOrder(order.id)}
-                      className="w-28 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
+                      className="w-24 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
                     >
                       接单
                     </Button>
@@ -161,9 +126,7 @@ const WorkPage = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-6 text-muted-foreground">
-            暂无新订单
-          </div>
+          <div className="text-center py-6 text-muted-foreground">暂无新订单</div>
         )}
       </Card>
 
@@ -174,9 +137,7 @@ const WorkPage = () => {
             <ChefHat className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-bold">制作中</h2>
           </div>
-          <Badge className="bg-primary/20 text-primary text-lg px-3">
-            {makingOrders.length}
-          </Badge>
+          <span className="text-2xl font-bold text-foreground">{makingOrders.length}</span>
         </div>
         
         {makingOrders.length > 0 ? (
@@ -186,22 +147,18 @@ const WorkPage = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span className="text-sm">{formatTime(order.orderTime)}</span>
-                        </div>
+                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
                         <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
                   </div>
                   <Button
                     onClick={() => handleFinishOrder(order.id)}
-                    className="w-28 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
+                    className="w-24 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
                   >
-                    <Check className="w-5 h-5 mr-1" />
                     完成
                   </Button>
                 </div>
@@ -209,9 +166,7 @@ const WorkPage = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-4 text-muted-foreground text-sm">
-            暂无制作中订单
-          </div>
+          <div className="text-center py-4 text-muted-foreground text-sm">暂无制作中订单</div>
         )}
       </Card>
 
@@ -222,9 +177,7 @@ const WorkPage = () => {
             <Package className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-bold">待取餐</h2>
           </div>
-          <Badge className="bg-primary/20 text-primary text-lg px-3">
-            {readyOrders.length}
-          </Badge>
+          <span className="text-2xl font-bold text-foreground">{readyOrders.length}</span>
         </div>
         
         {readyOrders.length > 0 ? (
@@ -234,22 +187,18 @@ const WorkPage = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span className="text-sm">{formatTime(order.orderTime)}</span>
-                        </div>
+                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
                         <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
                   </div>
                   <Button
                     onClick={() => handleCallRider(order.id)}
-                    className="w-28 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
+                    className="w-24 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
                   >
-                    <Truck className="w-5 h-5 mr-1" />
                     取餐
                   </Button>
                 </div>
@@ -257,9 +206,7 @@ const WorkPage = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-4 text-muted-foreground text-sm">
-            暂无待取餐订单
-          </div>
+          <div className="text-center py-4 text-muted-foreground text-sm">暂无待取餐订单</div>
         )}
       </Card>
 
@@ -271,9 +218,7 @@ const WorkPage = () => {
               <Truck className="w-5 h-5 text-muted-foreground" />
               <h2 className="text-lg font-bold">配送中</h2>
             </div>
-            <Badge variant="outline" className="text-lg px-3">
-              {deliveringOrders.length}
-            </Badge>
+            <span className="text-2xl font-bold text-foreground">{deliveringOrders.length}</span>
           </div>
           
           <div className="space-y-3">
@@ -282,18 +227,15 @@ const WorkPage = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
+                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span className="text-sm">{formatTime(order.orderTime)}</span>
-                        </div>
+                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
                         <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground">{formatItems(order.items)}</p>
+                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
                   </div>
-                  <Badge variant="secondary" className="w-28 h-14 flex items-center justify-center text-sm shrink-0">
+                  <Badge variant="secondary" className="px-4 py-2 shrink-0">
                     {order.riderStatus}
                   </Badge>
                 </div>
