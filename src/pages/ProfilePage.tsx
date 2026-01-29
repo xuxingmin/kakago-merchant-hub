@@ -61,15 +61,15 @@ const ProfilePage = () => {
   return (
     <div className="p-3 pb-20 space-y-3">
       {/* Header Banner */}
-      <div className="mb-1">
-        <div className="flex items-center gap-1.5">
-          <h1 className="text-2xl font-bold text-foreground">KAKAGO</h1>
-          <span className="text-primary text-lg">✦</span>
+      <div className="py-6 mb-2">
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-foreground">KAKAGO</h1>
+          <span className="text-primary text-xl">✦</span>
         </div>
-        <p className="text-sm text-primary mt-0.5">可负担的精品咖啡</p>
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-xs text-muted-foreground">每天都要喝</span>
-          <span className="text-xs text-muted-foreground">专业咖啡师出品</span>
+        <p className="text-base text-primary mt-1">可负担的精品咖啡</p>
+        <div className="flex items-center justify-between mt-8">
+          <span className="text-sm text-muted-foreground">每天都要喝</span>
+          <span className="text-sm text-muted-foreground">专业咖啡师出品</span>
         </div>
       </div>
 
