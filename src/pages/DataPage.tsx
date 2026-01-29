@@ -74,6 +74,7 @@ const DataPage = () => {
       <div className="grid grid-cols-2 gap-3">
         {/* 左边大块 - 今日利润 */}
         <Card className="glass-card p-4 row-span-2 flex flex-col justify-center">
+          <span className="text-xs font-bold text-muted-foreground mb-2">KAKAGO</span>
           <p className="text-xs text-muted-foreground mb-1">今日利润</p>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-foreground">¥{profit.toLocaleString()}</span>
@@ -175,7 +176,7 @@ const DataPage = () => {
       {/* 客户评分 */}
       <Card className="glass-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold text-foreground">客户评价</h2>
+          <h2 className="text-sm font-bold text-foreground">最新客户评价</h2>
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-warning fill-warning" />
             <span className="text-lg font-bold text-foreground">{rating}</span>
