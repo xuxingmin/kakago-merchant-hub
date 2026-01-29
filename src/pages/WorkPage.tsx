@@ -25,6 +25,11 @@ const WorkPage = () => {
   const [autoAccept, setAutoAccept] = useState(false);
   const [orders, setOrders] = useState<Order[]>(mockOrders);
 
+  const merchantInfo = {
+    name: "中关村创业大街店",
+    id: "KKG-0012",
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -69,43 +74,58 @@ const WorkPage = () => {
   return (
     <div className="p-4 pb-24 space-y-4">
       {/* Banner Card */}
-      <Card className="glass-card px-4 py-3">
+      <Card className="glass-card px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div>
-              <span className="text-lg font-bold text-primary">KAKAGO</span>
-              <span className="text-xs text-muted-foreground ml-1">商户端</span>
-            </div>
-            <div className="flex items-center gap-2">
+          {/* Left: Logo & Store Info */}
+          <div>
+            <p className="text-xl font-bold text-muted-foreground tracking-wider">KAKAGO</p>
+            <p className="text-sm text-foreground">{merchantInfo.name}</p>
+            <p className="text-xs text-muted-foreground">{merchantInfo.id}</p>
+          </div>
+          
+          {/* Right: Switches */}
+          <div className="flex items-center gap-6">
+            {/* Online Status */}
+            <div className="flex items-center gap-3">
               <Switch
                 checked={isOnline}
                 onCheckedChange={setIsOnline}
-                className="data-[state=checked]:bg-success"
+                className="scale-125 data-[state=checked]:bg-primary"
               />
-              <span className={`text-sm font-medium ${isOnline ? "text-success" : "text-muted-foreground"}`}>
-                {isOnline ? "上线中" : "已下线"}
-              </span>
+              <div className="flex flex-col">
+                <span className={`text-sm font-bold ${isOnline ? "text-primary" : "text-muted-foreground"}`}>
+                  {isOnline ? "正在" : "暂停"}
+                </span>
+                <span className={`text-sm font-bold ${isOnline ? "text-primary" : "text-muted-foreground"}`}>
+                  营业
+                </span>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">自动接单</span>
-            <Switch
-              checked={autoAccept}
-              onCheckedChange={setAutoAccept}
-              className="data-[state=checked]:bg-primary"
-            />
+            
+            {/* Auto Accept */}
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={autoAccept}
+                onCheckedChange={setAutoAccept}
+                className="scale-125 data-[state=checked]:bg-primary"
+              />
+              <div className="flex flex-col">
+                <span className="text-sm text-muted-foreground">自动</span>
+                <span className="text-sm text-muted-foreground">接单</span>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
 
       {/* New Orders */}
-      <Card className="glass-card p-4 border-warning/50">
+      <Card className="glass-card p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-warning" />
+            <Bell className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-bold">新订单</h2>
           </div>
-          <Badge className="bg-warning text-warning-foreground text-lg px-3">
+          <Badge className="bg-primary text-primary-foreground text-lg px-3">
             {pendingOrders.length}
           </Badge>
         </div>
@@ -113,13 +133,13 @@ const WorkPage = () => {
         {pendingOrders.length > 0 ? (
           <div className="space-y-3">
             {pendingOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-warning/10 border border-warning/30">
+              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
                       <span className="font-mono text-xl font-bold text-foreground">#{order.id}</span>
                       <div className="flex flex-col">
-                        <div className="flex items-center gap-1 text-warning">
+                        <div className="flex items-center gap-1 text-muted-foreground">
                           <Clock className="w-4 h-4" />
                           <span className="text-sm font-medium">{formatTime(order.orderTime)}</span>
                         </div>
@@ -131,7 +151,7 @@ const WorkPage = () => {
                   {!autoAccept && (
                     <Button
                       onClick={() => handleAcceptOrder(order.id)}
-                      className="w-28 h-14 bg-warning hover:bg-warning/90 text-warning-foreground text-lg font-bold shrink-0"
+                      className="w-28 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
                     >
                       接单
                     </Button>
@@ -148,7 +168,7 @@ const WorkPage = () => {
       </Card>
 
       {/* Making Orders */}
-      <Card className="glass-card p-4 border-primary/50">
+      <Card className="glass-card p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <ChefHat className="w-5 h-5 text-primary" />
@@ -162,7 +182,7 @@ const WorkPage = () => {
         {makingOrders.length > 0 ? (
           <div className="space-y-3">
             {makingOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
@@ -179,7 +199,7 @@ const WorkPage = () => {
                   </div>
                   <Button
                     onClick={() => handleFinishOrder(order.id)}
-                    className="w-28 h-14 bg-primary hover:bg-primary/90 text-lg font-bold shrink-0"
+                    className="w-28 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
                   >
                     <Check className="w-5 h-5 mr-1" />
                     完成
@@ -196,13 +216,13 @@ const WorkPage = () => {
       </Card>
 
       {/* Ready for Pickup */}
-      <Card className="glass-card p-4 border-success/50">
+      <Card className="glass-card p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-success" />
+            <Package className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-bold">待取餐</h2>
           </div>
-          <Badge className="bg-success/20 text-success text-lg px-3">
+          <Badge className="bg-primary/20 text-primary text-lg px-3">
             {readyOrders.length}
           </Badge>
         </div>
@@ -210,7 +230,7 @@ const WorkPage = () => {
         {readyOrders.length > 0 ? (
           <div className="space-y-3">
             {readyOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-success/10 border border-success/30">
+              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
@@ -227,7 +247,7 @@ const WorkPage = () => {
                   </div>
                   <Button
                     onClick={() => handleCallRider(order.id)}
-                    className="w-28 h-14 bg-success hover:bg-success/90 text-success-foreground text-lg font-bold shrink-0"
+                    className="w-28 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
                   >
                     <Truck className="w-5 h-5 mr-1" />
                     取餐
@@ -258,7 +278,7 @@ const WorkPage = () => {
           
           <div className="space-y-3">
             {deliveringOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-secondary/50">
+              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-4 mb-2">
