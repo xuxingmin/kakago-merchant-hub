@@ -68,8 +68,11 @@ const WorkPage = () => {
     );
   };
 
-  const pendingOrders = orders.filter(o => o.status === "pending");
-  const makingOrders = orders.filter(o => o.status === "making");
+  // When autoAccept is on, pending orders are treated as making
+  const pendingOrders = autoAccept ? [] : orders.filter(o => o.status === "pending");
+  const makingOrders = autoAccept 
+    ? orders.filter(o => o.status === "pending" || o.status === "making")
+    : orders.filter(o => o.status === "making");
   const readyOrders = orders.filter(o => o.status === "ready");
   const deliveringOrders = orders.filter(o => o.status === "delivering");
 
