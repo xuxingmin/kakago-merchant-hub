@@ -22,8 +22,8 @@ const mockOrders: Order[] = [
   { id: "K008", items: [{ name: "焦糖玛奇朵", qty: 1 }], status: "making", orderTime: 220 },
   { id: "K003", items: [{ name: "摩卡", qty: 2 }], status: "ready", orderTime: 420 },
   { id: "K009", items: [{ name: "抹茶拿铁", qty: 1 }], status: "ready", orderTime: 450 },
-  { id: "K004", items: [{ name: "冰美式", qty: 3 }], status: "delivering", orderTime: 600, riderStatus: "骑手已取餐" },
-  { id: "K010", items: [{ name: "热美式", qty: 2 }], status: "delivering", orderTime: 650, riderStatus: "配送中" },
+  { id: "K004", items: [{ name: "冰美式", qty: 3 }], status: "delivering", orderTime: 600 },
+  { id: "K010", items: [{ name: "热美式", qty: 2 }], status: "delivering", orderTime: 650 },
 ];
 
 const WorkPage = () => {
@@ -61,9 +61,7 @@ const WorkPage = () => {
   const handleCallRider = (orderId: string) => {
     setOrders(prev =>
       prev.map(o =>
-        o.id === orderId
-          ? { ...o, status: "delivering", riderStatus: "骑手已取餐" }
-          : o
+        o.id === orderId ? { ...o, status: "delivering" } : o
       )
     );
   };
@@ -248,7 +246,7 @@ const WorkPage = () => {
                         <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                       </div>
                       <Badge variant="secondary" className="px-3 py-1 text-xs shrink-0">
-                        {order.riderStatus}
+                        配送中
                       </Badge>
                     </div>
                   </div>
