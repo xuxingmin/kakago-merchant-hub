@@ -15,9 +15,15 @@ interface Order {
 
 const mockOrders: Order[] = [
   { id: "K001", items: [{ name: "拿铁", qty: 2 }, { name: "美式", qty: 1 }], status: "pending", orderTime: 45 },
+  { id: "K005", items: [{ name: "燕麦拿铁", qty: 1 }], status: "pending", orderTime: 60 },
+  { id: "K006", items: [{ name: "冷萃", qty: 2 }], status: "pending", orderTime: 90 },
   { id: "K002", items: [{ name: "卡布奇诺", qty: 1 }], status: "making", orderTime: 180 },
+  { id: "K007", items: [{ name: "香草拿铁", qty: 2 }], status: "making", orderTime: 200 },
+  { id: "K008", items: [{ name: "焦糖玛奇朵", qty: 1 }], status: "making", orderTime: 220 },
   { id: "K003", items: [{ name: "摩卡", qty: 2 }], status: "ready", orderTime: 420 },
+  { id: "K009", items: [{ name: "抹茶拿铁", qty: 1 }], status: "ready", orderTime: 450 },
   { id: "K004", items: [{ name: "冰美式", qty: 3 }], status: "delivering", orderTime: 600, riderStatus: "骑手已取餐" },
+  { id: "K010", items: [{ name: "热美式", qty: 2 }], status: "delivering", orderTime: 650, riderStatus: "配送中" },
 ];
 
 const WorkPage = () => {
@@ -90,34 +96,34 @@ const WorkPage = () => {
       </Card>
 
       {/* New Orders */}
-      <Card className="glass-card p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold">新订单</h2>
+      <Card className="glass-card p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-bold">新订单</h2>
           </div>
-          <span className="text-2xl font-bold text-foreground">{pendingOrders.length}</span>
+          <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
         </div>
         
         {pendingOrders.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             {pendingOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
-                <div className="flex items-center justify-between gap-3">
+              <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
-                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
+                    <div className="flex items-center gap-3 mb-0.5">
+                      <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatTime(order.orderTime)}</span>
+                        <span>共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
+                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                   </div>
                   {!autoAccept && (
                     <Button
                       onClick={() => handleAcceptOrder(order.id)}
-                      className="w-24 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
+                      className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
                     >
                       接单
                     </Button>
@@ -132,33 +138,33 @@ const WorkPage = () => {
       </Card>
 
       {/* Making Orders */}
-      <Card className="glass-card p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <ChefHat className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold">制作中</h2>
+      <Card className="glass-card p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <ChefHat className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-bold">制作中</h2>
           </div>
-          <span className="text-2xl font-bold text-foreground">{makingOrders.length}</span>
+          <span className="text-lg font-bold text-foreground">{makingOrders.length}</span>
         </div>
         
         {makingOrders.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             {makingOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
-                <div className="flex items-center justify-between gap-3">
+              <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
-                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
+                    <div className="flex items-center gap-3 mb-0.5">
+                      <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatTime(order.orderTime)}</span>
+                        <span>共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
+                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                   </div>
                   <Button
                     onClick={() => handleFinishOrder(order.id)}
-                    className="w-24 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
+                    className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
                   >
                     完成
                   </Button>
@@ -167,38 +173,38 @@ const WorkPage = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-4 text-muted-foreground text-sm">暂无制作中订单</div>
+          <div className="text-center py-2 text-muted-foreground text-xs">暂无制作中订单</div>
         )}
       </Card>
 
       {/* Ready for Pickup */}
-      <Card className="glass-card p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold">待取餐</h2>
+      <Card className="glass-card p-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <Package className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-bold">待取餐</h2>
           </div>
-          <span className="text-2xl font-bold text-foreground">{readyOrders.length}</span>
+          <span className="text-lg font-bold text-foreground">{readyOrders.length}</span>
         </div>
         
         {readyOrders.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             {readyOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
-                <div className="flex items-center justify-between gap-3">
+              <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
-                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
+                    <div className="flex items-center gap-3 mb-0.5">
+                      <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatTime(order.orderTime)}</span>
+                        <span>共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
+                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                   </div>
                   <Button
                     onClick={() => handleCallRider(order.id)}
-                    className="w-24 h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold shrink-0"
+                    className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
                   >
                     取餐
                   </Button>
@@ -207,36 +213,36 @@ const WorkPage = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-4 text-muted-foreground text-sm">暂无待取餐订单</div>
+          <div className="text-center py-2 text-muted-foreground text-xs">暂无待取餐订单</div>
         )}
       </Card>
 
       {/* Delivering */}
       {deliveringOrders.length > 0 && (
-        <Card className="glass-card p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Truck className="w-5 h-5 text-muted-foreground" />
-              <h2 className="text-lg font-bold">配送中</h2>
+        <Card className="glass-card p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <Truck className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-bold">配送中</h2>
             </div>
-            <span className="text-2xl font-bold text-foreground">{deliveringOrders.length}</span>
+            <span className="text-lg font-bold text-foreground">{deliveringOrders.length}</span>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             {deliveringOrders.map(order => (
-              <div key={order.id} className="p-3 rounded-lg bg-secondary/50 border border-border">
-                <div className="flex items-center justify-between gap-3">
+              <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="font-mono text-2xl font-bold text-foreground">#{order.id}</span>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-muted-foreground">{formatTime(order.orderTime)}</span>
-                        <span className="text-xs text-muted-foreground">共{getTotalQty(order.items)}杯</span>
+                    <div className="flex items-center gap-3 mb-0.5">
+                      <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatTime(order.orderTime)}</span>
+                        <span>共{getTotalQty(order.items)}杯</span>
                       </div>
                     </div>
-                    <p className="text-foreground font-medium">{formatItems(order.items)}</p>
+                    <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                   </div>
-                  <Badge variant="secondary" className="px-4 py-2 shrink-0">
+                  <Badge variant="secondary" className="px-3 py-1 text-xs shrink-0">
                     {order.riderStatus}
                   </Badge>
                 </div>
