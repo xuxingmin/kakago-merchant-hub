@@ -3,40 +3,34 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Package, Milk, Coffee, Phone, Plus, Minus } from "lucide-react";
+import { AlertTriangle, Package, Milk, Coffee, Phone, Plus, Minus, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
+import { 
+  useStore, 
+  useRawMaterials, 
+  usePackagingMaterials, 
+  calculateAvailableCups,
+  RawMaterial,
+  PackagingMaterial
+} from "@/hooks/useInventory";
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Milk,
+  Coffee,
+};
 
 const InventoryPage = () => {
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
   const [replenishItems, setReplenishItems] = useState<Record<string, number>>({});
 
-  const inventory = {
-    milk: { current: 15, max: 50, unit: "L", name: "牛奶", icon: Milk, usage: 0.2 },
-    beans: { current: 8, max: 20, unit: "kg", name: "咖啡豆", icon: Coffee, usage: 0.015 },
-  };
+  const { data: store, isLoading: storeLoading } = useStore();
+  const { data: rawMaterials = [], isLoading: rawLoading } = useRawMaterials();
+  const { data: packagingMaterials = [], isLoading: packagingLoading } = usePackagingMaterials();
 
-  const packaging = {
-    hotCups: { current: 60, max: 300, name: "热杯" },
-    coldCups: { current: 80, max: 300, name: "冰杯" },
-    hotLids: { current: 50, max: 300, name: "热杯盖" },
-    coldLids: { current: 70, max: 300, name: "冰杯盖" },
-    paperBags: { current: 100, max: 200, name: "纸袋" },
-    sleeves: { current: 80, max: 300, name: "杯套" },
-    holders: { current: 40, max: 200, name: "杯托" },
-    straws: { current: 200, max: 500, name: "吸管" },
-    sealStickers: { current: 150, max: 400, name: "封口贴纸" },
-  };
+  const isLoading = storeLoading || rawLoading || packagingLoading;
 
-  const calculateAvailable = () => {
-    const milkLimit = Math.floor(inventory.milk.current / inventory.milk.usage);
-    const beansLimit = Math.floor(inventory.beans.current / inventory.beans.usage);
-    const cupsLimit = Math.min(packaging.hotCups.current, packaging.coldCups.current);
-    const lidsLimit = Math.min(packaging.hotLids.current, packaging.coldLids.current);
-    return Math.min(milkLimit, beansLimit, cupsLimit, lidsLimit);
-  };
-
-  const availableProducts = calculateAvailable();
+  const availableProducts = calculateAvailableCups(rawMaterials, packagingMaterials);
   const isLowStock = availableProducts < 50;
 
   const getStockStatus = (current: number, max: number) => {
@@ -60,19 +54,27 @@ const InventoryPage = () => {
   };
 
   const allItems = [
-    ...Object.entries(inventory).map(([k, v]) => ({ key: k, ...v })),
-    ...Object.entries(packaging).map(([k, v]) => ({ key: k, ...v, unit: "个" })),
+    ...rawMaterials.map((m) => ({ key: m.id, name: m.name, unit: m.unit })),
+    ...packagingMaterials.map((m) => ({ key: m.id, name: m.name, unit: "个" })),
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-3 pb-20 space-y-2">
       {/* Header - Store Info & Available Count */}
       <div className="grid grid-cols-2 gap-2">
         <Card className="glass-card px-3 py-2">
-          <span className="text-sm font-bold text-muted-foreground">KAKAGO</span>
+          <span className="text-sm font-bold text-muted-foreground">{store?.brand || "KAKAGO"}</span>
           <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground">中关村店</span>
-            <span className="text-xs text-muted-foreground">KKG-0012</span>
+            <span className="text-xs text-muted-foreground">{store?.name || "门店"}</span>
+            <span className="text-xs text-muted-foreground">{store?.code || ""}</span>
           </div>
         </Card>
 
@@ -96,15 +98,7 @@ const InventoryPage = () => {
 
       {/* Supply Chain & Emergency Replenish */}
       <div className="grid grid-cols-2 gap-2">
-        <SmartSupplyChainWidget 
-          isRestockActive={true}
-          estimatedDays={6}
-          inboundItems={[
-            { name: "咖啡豆", quantity: "20kg" },
-            { name: "牛奶", quantity: "5盒" },
-            { name: "热杯", quantity: "1000个" },
-          ]}
-        />
+        <SmartSupplyChainWidget />
 
         <Button 
           className="text-sm font-bold bg-primary hover:bg-primary/90 h-auto py-2"
@@ -126,19 +120,20 @@ const InventoryPage = () => {
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
           <div className="space-y-2">
-            {Object.values(inventory).map((item) => {
-              const status = getStockStatus(item.current, item.max);
-              const percentage = (item.current / item.max) * 100;
+            {rawMaterials.map((item) => {
+              const status = getStockStatus(item.current_amount, item.max_amount);
+              const percentage = (item.current_amount / item.max_amount) * 100;
+              const IconComponent = iconMap[item.icon] || Package;
               return (
-                <div key={item.name} className="space-y-1">
+                <div key={item.id} className="space-y-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <item.icon className="w-4 h-4 text-muted-foreground" />
+                      <IconComponent className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-medium">{item.name}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-base font-bold">{item.current}</span>
-                      <span className="text-muted-foreground text-xs">/ {item.max} {item.unit}</span>
+                      <span className="text-base font-bold">{item.current_amount}</span>
+                      <span className="text-muted-foreground text-xs">/ {item.max_amount} {item.unit}</span>
                       <Badge
                         variant={status.color === "success" ? "default" : status.color === "warning" ? "secondary" : "destructive"}
                         className={`text-[10px] px-1.5 py-0 ${
@@ -167,11 +162,11 @@ const InventoryPage = () => {
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">包材</h3>
           <div className="grid grid-cols-3 gap-1.5">
-            {Object.values(packaging).map((item) => {
-              const status = getStockStatus(item.current, item.max);
-              const percentage = (item.current / item.max) * 100;
+            {packagingMaterials.map((item) => {
+              const status = getStockStatus(item.current_amount, item.max_amount);
+              const percentage = (item.current_amount / item.max_amount) * 100;
               return (
-                <div key={item.name} className="p-1.5 rounded bg-secondary/30">
+                <div key={item.id} className="p-1.5 rounded bg-secondary/30">
                   <div className="flex items-center justify-between mb-0.5">
                     <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
                     <Badge
@@ -185,8 +180,8 @@ const InventoryPage = () => {
                     </Badge>
                   </div>
                   <div className="flex items-baseline gap-0.5">
-                    <span className="text-sm font-bold">{item.current}</span>
-                    <span className="text-[8px] text-muted-foreground">/{item.max}</span>
+                    <span className="text-sm font-bold">{item.current_amount}</span>
+                    <span className="text-[8px] text-muted-foreground">/{item.max_amount}</span>
                   </div>
                   <Progress
                     value={percentage}
