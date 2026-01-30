@@ -139,47 +139,47 @@ const WorkPage = () => {
       <div className="p-4 space-y-3">
         {activeTab === "order" ? (
           <>
-            {/* New Orders */}
-            <Card className="glass-card p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-1.5">
-                  <Bell className="w-4 h-4 text-primary" />
-                  <h2 className="text-sm font-bold">新订单</h2>
+            {/* New Orders - Only show when manual accept mode */}
+            {!autoAccept && (
+              <Card className="glass-card p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <Bell className="w-4 h-4 text-primary" />
+                    <h2 className="text-sm font-bold">新订单</h2>
+                  </div>
+                  <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
                 </div>
-                <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
-              </div>
-              
-              {pendingOrders.length > 0 ? (
-                <div className="space-y-1.5">
-                  {pendingOrders.map(order => (
-                    <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-0.5">
-                            <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>{formatTime(order.orderTime)}</span>
-                              <span>共{getTotalQty(order.items)}杯</span>
+                
+                {pendingOrders.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {pendingOrders.map(order => (
+                      <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-0.5">
+                              <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>{formatTime(order.orderTime)}</span>
+                                <span>共{getTotalQty(order.items)}杯</span>
+                              </div>
                             </div>
+                            <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <p className="text-sm text-foreground">{formatItems(order.items)}</p>
-                        </div>
-                        {!autoAccept && (
                           <Button
                             onClick={() => handleAcceptOrder(order.id)}
                             className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
                           >
                             接单
                           </Button>
-                        )}
-                      </div>
+                        </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-6 text-muted-foreground">暂无新订单</div>
               )}
-            </Card>
+              </Card>
+            )}
 
             {/* Making Orders (includes ready orders with different button) */}
             <Card className="glass-card p-3">
