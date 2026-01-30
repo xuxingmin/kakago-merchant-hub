@@ -9,60 +9,54 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useActiveRestockShipment, useRestockItems, useConfirmRestockDelivery } from "@/hooks/useInventory";
 
-interface InboundItem {
-  name: string;
-  quantity: string;
-}
-
-interface SmartSupplyChainWidgetProps {
-  isRestockActive?: boolean;
-  estimatedDays?: number;
-  inboundItems?: InboundItem[];
-  onConfirmReceipt?: () => void;
-}
-
-const SmartSupplyChainWidget = ({
-  isRestockActive = true, // 默认为补货进行中状态便于演示
-  estimatedDays = 6,
-  inboundItems = [
-    { name: "咖啡豆", quantity: "20kg" },
-    { name: "牛奶", quantity: "5盒" },
-    { name: "热杯", quantity: "1000个" },
-  ],
-  onConfirmReceipt,
-}: SmartSupplyChainWidgetProps) => {
+const SmartSupplyChainWidget = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [localRestockActive, setLocalRestockActive] = useState(isRestockActive);
+
+  const { data: activeShipment, isLoading: shipmentLoading } = useActiveRestockShipment();
+  const { data: restockItems = [] } = useRestockItems(activeShipment?.id);
+  const confirmDelivery = useConfirmRestockDelivery();
+
+  const isRestockActive = !!activeShipment;
+  const estimatedDays = activeShipment?.estimated_days || 0;
 
   const handleWidgetClick = () => {
-    if (localRestockActive) {
+    if (isRestockActive) {
       setShowConfirmDialog(true);
     }
   };
 
   const handleConfirmReceipt = async () => {
-    setIsLoading(true);
+    if (!activeShipment) return;
     
-    // 模拟API调用
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsLoading(false);
-    setIsSuccess(true);
-    
-    // 显示成功状态后关闭弹窗并恢复状态A
-    setTimeout(() => {
-      setShowConfirmDialog(false);
-      setIsSuccess(false);
-      setLocalRestockActive(false);
-      onConfirmReceipt?.();
-    }, 1000);
+    try {
+      await confirmDelivery.mutateAsync(activeShipment.id);
+      setIsSuccess(true);
+      
+      setTimeout(() => {
+        setShowConfirmDialog(false);
+        setIsSuccess(false);
+      }, 1000);
+    } catch (error) {
+      console.error("Failed to confirm delivery:", error);
+    }
   };
 
+  if (shipmentLoading) {
+    return (
+      <Card className="bg-[#1A1A1A] border-border px-3 py-2">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+          <span className="text-xs text-muted-foreground">加载中...</span>
+        </div>
+      </Card>
+    );
+  }
+
   // 状态 A: 系统正常 (Idle State)
-  if (!localRestockActive) {
+  if (!isRestockActive) {
     return (
       <Card className="bg-[#1A1A1A] border-border px-3 py-2">
         <div className="flex items-center gap-2">
@@ -114,13 +108,13 @@ const SmartSupplyChainWidget = ({
           {/* 清单内容 */}
           <div className="space-y-2 py-3">
             <p className="text-xs text-muted-foreground mb-2">本次补货清单：</p>
-            {inboundItems.map((item, index) => (
+            {restockItems.map((item) => (
               <div
-                key={index}
+                key={item.id}
                 className="flex items-center justify-between p-2 rounded bg-secondary/30 border border-border"
               >
                 <span className="text-sm font-medium text-foreground">
-                  {item.name}
+                  {item.item_name}
                 </span>
                 <span className="text-sm font-bold text-primary">
                   x {item.quantity}
@@ -139,9 +133,9 @@ const SmartSupplyChainWidget = ({
               <Button
                 className="w-full h-12 text-sm font-bold bg-primary hover:bg-primary/90"
                 onClick={handleConfirmReceipt}
-                disabled={isLoading || isSuccess}
+                disabled={confirmDelivery.isPending || isSuccess}
               >
-                {isLoading ? (
+                {confirmDelivery.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     处理中...
@@ -156,7 +150,7 @@ const SmartSupplyChainWidget = ({
                 )}
               </Button>
               
-              {!isLoading && !isSuccess && (
+              {!confirmDelivery.isPending && !isSuccess && (
                 <Button
                   variant="ghost"
                   size="sm"
