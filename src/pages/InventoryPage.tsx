@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Package, Milk, Coffee, Phone, Calendar, Plus, Minus } from "lucide-react";
+import { AlertTriangle, Package, Milk, Coffee, Phone, Plus, Minus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
 
 const InventoryPage = () => {
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
@@ -93,15 +94,17 @@ const InventoryPage = () => {
         </Card>
       </div>
 
-      {/* Replenish Buttons */}
+      {/* Supply Chain & Emergency Replenish */}
       <div className="grid grid-cols-2 gap-2">
-        <Card className="glass-card px-3 py-2 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-primary" />
-          <div>
-            <p className="text-xs font-bold text-foreground">KAKAGO</p>
-            <p className="text-[10px] text-muted-foreground">每周定时补货</p>
-          </div>
-        </Card>
+        <SmartSupplyChainWidget 
+          isRestockActive={true}
+          estimatedDays={6}
+          inboundItems={[
+            { name: "咖啡豆", quantity: "20kg" },
+            { name: "牛奶", quantity: "5盒" },
+            { name: "热杯", quantity: "1000个" },
+          ]}
+        />
 
         <Button 
           className="text-sm font-bold bg-primary hover:bg-primary/90 h-auto py-2"
