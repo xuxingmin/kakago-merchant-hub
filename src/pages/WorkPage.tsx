@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Truck, ChefHat, Bell } from "lucide-react";
+import SwipeableOrderCard from "@/components/SwipeableOrderCard";
 
 interface Order {
   id: string;
@@ -54,6 +55,13 @@ const WorkPage = () => {
   const handleFinishOrder = (orderId: string) => {
     setOrders(prev =>
       prev.map(o => (o.id === orderId ? { ...o, status: "ready" } : o))
+    );
+  };
+
+  // Revert ready order back to making (swipe to undo)
+  const handleRevertToMaking = (orderId: string) => {
+    setOrders(prev =>
+      prev.map(o => (o.id === orderId ? { ...o, status: "making" } : o))
     );
   };
 
@@ -194,32 +202,50 @@ const WorkPage = () => {
               {productionOrders.length > 0 ? (
                 <div className="space-y-1.5">
                   {productionOrders.map(order => (
-                    <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-0.5">
-                            <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>{formatTime(order.orderTime)}</span>
-                              <span>共{getTotalQty(order.items)}杯</span>
+                    order.status === "ready" ? (
+                      <SwipeableOrderCard
+                        key={order.id}
+                        enabled={true}
+                        onSwipeLeft={() => handleRevertToMaking(order.id)}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-0.5">
+                              <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>{formatTime(order.orderTime)}</span>
+                                <span>共{getTotalQty(order.items)}杯</span>
+                              </div>
                             </div>
+                            <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                          <Badge className="px-3 py-2 text-sm font-bold bg-amber-500 text-white border-amber-500 shrink-0">
+                            待取餐
+                          </Badge>
                         </div>
-                        {order.status === "making" || order.status === "pending" ? (
+                      </SwipeableOrderCard>
+                    ) : (
+                      <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-0.5">
+                              <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>{formatTime(order.orderTime)}</span>
+                                <span>共{getTotalQty(order.items)}杯</span>
+                              </div>
+                            </div>
+                            <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                          </div>
                           <Button
                             onClick={() => handleFinishOrder(order.id)}
                             className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
                           >
                             完成
                           </Button>
-                        ) : (
-                          <Badge className="px-3 py-2 text-sm font-bold bg-amber-500 text-white border-amber-500 shrink-0">
-                            待取餐
-                          </Badge>
-                        )}
+                        </div>
                       </div>
-                    </div>
+                    )
                   ))}
                 </div>
               ) : (
