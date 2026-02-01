@@ -12,11 +12,6 @@ const navItems = [
 const BottomNav = () => {
   const location = useLocation();
 
-  // Hide nav on auth page
-  if (location.pathname === "/auth") {
-    return null;
-  }
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
