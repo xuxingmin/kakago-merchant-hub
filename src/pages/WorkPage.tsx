@@ -84,7 +84,7 @@ const WorkPage = () => {
   };
 
   const formatItems = (items: { name: string; qty: number }[]) => {
-    return items.map(item => `${item.name} ×${item.qty}`).join("、");
+    return items.map(item => `${item.name} ×${item.qty}`);
   };
 
   const handleAcceptOrder = (orderId: string) => {
@@ -204,15 +204,16 @@ const WorkPage = () => {
       <div className="p-4 space-y-3">
         {activeTab === "order" ? (
           <>
-            {/* Pending Orders - Only show when manual accept mode */}
+            {/* 待确认 - 手动接单模式下显示，用户30s内可取消 */}
             {!autoAccept && (
               <Card className="glass-card p-3">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold">待确认订单</h2>
+                    <h2 className="text-sm font-bold">待确认</h2>
                     <span className="text-xs text-muted-foreground ml-1">用户30s内可取消</span>
                   </div>
+                  <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
                 </div>
                 
                 {pendingOrders.length > 0 ? (
@@ -228,16 +229,19 @@ const WorkPage = () => {
                                 <span>共{getTotalQty(order.items)}杯</span>
                               </div>
                             </div>
-                            <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                            <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                              {formatItems(order.items).map((item, i) => (
+                                <span key={i} className="text-sm text-foreground">{item}</span>
+                              ))}
+                            </div>
                           </div>
                           <div className="flex flex-col items-center gap-1 shrink-0">
-                            <span className="text-xs font-mono text-destructive font-bold">
+                            <span className="text-xs font-mono text-foreground font-bold">
                               {countdowns[order.id] !== undefined ? `${countdowns[order.id]}s` : "30s"}
                             </span>
                             <Button
                               onClick={() => handleOpenCancel(order.id)}
-                              variant="destructive"
-                              className="w-16 h-8 text-sm font-bold"
+                              className="w-16 h-8 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
                             >
                               取消
                             </Button>
@@ -247,18 +251,18 @@ const WorkPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6 text-muted-foreground">暂无待确认订单</div>
+                <div className="text-center py-6 text-muted-foreground">暂无待确认</div>
               )}
               </Card>
             )}
 
-            {/* Making Orders (includes ready orders with different button) */}
+            {/* 制作中 - 完成制作→小票扫码→骑手取货，全自动流转 */}
             <Card className="glass-card p-3">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-1.5">
                   <ChefHat className="w-4 h-4 text-primary" />
                   <h2 className="text-sm font-bold">制作中</h2>
-                  <span className="text-xs text-muted-foreground ml-1">小票扫码确认完成，骑手取货后自动配送</span>
+                  <span className="text-xs text-muted-foreground ml-1">完成制作→小票扫码→骑手取货</span>
                 </div>
                 <span className="text-lg font-bold text-foreground">{productionOrders.length}</span>
               </div>
@@ -281,7 +285,11 @@ const WorkPage = () => {
                                 <span>共{getTotalQty(order.items)}杯</span>
                               </div>
                             </div>
-                            <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                            <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                              {formatItems(order.items).map((item, i) => (
+                                <span key={i} className="text-sm text-foreground">{item}</span>
+                              ))}
+                            </div>
                           </div>
                           <Badge className="px-3 py-2 text-sm font-bold bg-primary text-primary-foreground border-primary shrink-0">
                             待取餐
@@ -299,12 +307,15 @@ const WorkPage = () => {
                                 <span>共{getTotalQty(order.items)}杯</span>
                               </div>
                             </div>
-                            <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                            <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                              {formatItems(order.items).map((item, i) => (
+                                <span key={i} className="text-sm text-foreground">{item}</span>
+                              ))}
+                            </div>
                           </div>
                           <Button
                             onClick={() => handleOpenCancel(order.id)}
-                            variant="destructive"
-                            className="w-20 h-8 text-xs font-bold shrink-0"
+                            className="w-20 h-8 text-xs font-bold shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                           >
                             紧急取消
                           </Button>
@@ -344,7 +355,11 @@ const WorkPage = () => {
                               <span>共{getTotalQty(order.items)}杯</span>
                             </div>
                           </div>
-                          <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {formatItems(order.items).map((item, i) => (
+                              <span key={i} className="text-sm text-foreground">{item}</span>
+                            ))}
+                          </div>
                         </div>
                         <Badge className="px-3 py-1 text-xs shrink-0 bg-primary/80 text-primary-foreground border-primary/80">
                           配送中
@@ -381,7 +396,11 @@ const WorkPage = () => {
                               <span>共{getTotalQty(order.items)}杯</span>
                             </div>
                           </div>
-                          <p className="text-sm text-foreground">{formatItems(order.items)}</p>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {formatItems(order.items).map((item, i) => (
+                              <span key={i} className="text-sm text-foreground">{item}</span>
+                            ))}
+                          </div>
                         </div>
                         <Badge className="px-3 py-1 text-xs shrink-0 bg-muted text-foreground border-border">
                           已完成
@@ -433,8 +452,7 @@ const WorkPage = () => {
           </div>
           <Button
             onClick={handleConfirmCancel}
-            variant="destructive"
-            className="w-full mt-2"
+            className="w-full mt-2 bg-primary hover:bg-primary/90 text-primary-foreground"
             disabled={!cancelReason || (cancelReason === "其他" && !customReason.trim())}
           >
             确认取消
