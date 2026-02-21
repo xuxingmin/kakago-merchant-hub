@@ -66,25 +66,25 @@ const DataPage = () => {
   return (
     <div className="p-4 pb-24 space-y-3">
       {/* 四宫格核心数据 */}
-      <div className="grid grid-cols-2 gap-2">
-        <Card className="glass-card p-3 text-center">
-          <p className="text-xs text-muted-foreground">今日利润</p>
-          <span className="text-lg font-bold text-foreground">¥{profit.toLocaleString()}</span>
+      <div className="grid grid-cols-2 gap-2.5">
+        <Card className="glass-card px-4 py-3.5 text-center">
+          <p className="text-[11px] text-muted-foreground mb-1">今日利润</p>
+          <span className="text-xl font-black text-foreground">¥{profit.toLocaleString()}</span>
         </Card>
-        <Card className="glass-card p-3 text-center">
-          <p className="text-xs text-muted-foreground">结算周利润</p>
-          <span className="text-lg font-bold text-primary">¥{(profit * 5.2).toLocaleString()}</span>
+        <Card className="glass-card px-4 py-3.5 text-center">
+          <p className="text-[11px] text-muted-foreground mb-1">结算周利润</p>
+          <span className="text-xl font-black text-primary">¥{(profit * 5.2).toLocaleString()}</span>
         </Card>
-        <Card className="glass-card p-3 text-center">
-          <p className="text-xs text-muted-foreground">累计收益</p>
-          <span className="text-lg font-bold text-foreground">¥{(128600).toLocaleString()}</span>
+        <Card className="glass-card px-4 py-3.5 text-center">
+          <p className="text-[11px] text-muted-foreground mb-1">平台累计收益</p>
+          <span className="text-xl font-black text-foreground">¥{(128600).toLocaleString()}</span>
         </Card>
         <Card
-          className="glass-card p-3 text-center cursor-pointer active:scale-[0.97] transition-transform"
+          className="glass-card px-4 py-3.5 text-center cursor-pointer active:scale-[0.97] transition-transform"
           onClick={() => setShowAllOrders(true)}
         >
-          <p className="text-xs text-muted-foreground">今日出杯</p>
-          <span className="text-lg font-bold text-foreground">{totalCups}</span>
+          <p className="text-[11px] text-muted-foreground mb-1">今日出杯</p>
+          <span className="text-xl font-black text-foreground">{totalCups}</span>
         </Card>
       </div>
 
