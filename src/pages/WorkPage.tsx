@@ -258,7 +258,7 @@ const WorkPage = () => {
                 <div className="flex items-center gap-1.5">
                   <ChefHat className="w-4 h-4 text-primary" />
                   <h2 className="text-sm font-bold">制作中</h2>
-                  <span className="text-xs text-muted-foreground ml-1">骑手取货后自动跳转配送</span>
+                  <span className="text-xs text-muted-foreground ml-1">小票扫码确认完成，骑手取货后自动配送</span>
                 </div>
                 <span className="text-lg font-bold text-foreground">{productionOrders.length}</span>
               </div>
@@ -301,12 +301,9 @@ const WorkPage = () => {
                             </div>
                             <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <Button
-                            onClick={() => handleFinishOrder(order.id)}
-                            className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
-                          >
-                            完成
-                          </Button>
+                          <Badge className="px-3 py-2 text-sm font-bold bg-primary/20 text-primary border-primary/30 shrink-0">
+                            制作中
+                          </Badge>
                         </div>
                       </div>
                     )
