@@ -207,13 +207,12 @@ const WorkPage = () => {
             {/* Pending Orders - Only show when manual accept mode */}
             {!autoAccept && (
               <Card className="glass-card p-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-primary" />
                     <h2 className="text-sm font-bold">待确认订单</h2>
                     <span className="text-xs text-muted-foreground ml-1">用户30s内可取消</span>
                   </div>
-                  <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
                 </div>
                 
                 {pendingOrders.length > 0 ? (
@@ -231,14 +230,14 @@ const WorkPage = () => {
                             </div>
                             <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex flex-col items-center gap-1 shrink-0">
                             <span className="text-xs font-mono text-destructive font-bold">
                               {countdowns[order.id] !== undefined ? `${countdowns[order.id]}s` : "30s"}
                             </span>
                             <Button
                               onClick={() => handleOpenCancel(order.id)}
                               variant="destructive"
-                              className="w-16 h-10 text-sm font-bold"
+                              className="w-16 h-8 text-sm font-bold"
                             >
                               取消
                             </Button>
@@ -255,10 +254,11 @@ const WorkPage = () => {
 
             {/* Making Orders (includes ready orders with different button) */}
             <Card className="glass-card p-3">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-1.5">
                   <ChefHat className="w-4 h-4 text-primary" />
                   <h2 className="text-sm font-bold">制作中</h2>
+                  <span className="text-xs text-muted-foreground ml-1">骑手取货后自动跳转配送</span>
                 </div>
                 <span className="text-lg font-bold text-foreground">{productionOrders.length}</span>
               </div>
