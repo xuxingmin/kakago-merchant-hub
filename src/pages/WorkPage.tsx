@@ -207,14 +207,14 @@ const WorkPage = () => {
             {/* Pending Orders - Only show when manual accept mode */}
             {!autoAccept && (
               <Card className="glass-card p-3">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-primary" />
                     <h2 className="text-sm font-bold">待确认订单</h2>
+                    <span className="text-xs text-muted-foreground ml-1">用户30s内可取消</span>
                   </div>
                   <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mb-2">等待用户确认 · 如无法接单请在下方取消</p>
                 
                 {pendingOrders.length > 0 ? (
                   <div className="space-y-1.5">
