@@ -283,7 +283,7 @@ const WorkPage = () => {
                             </div>
                             <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <Badge className="px-3 py-2 text-sm font-bold bg-amber-500 text-white border-amber-500 shrink-0">
+                          <Badge className="px-3 py-2 text-sm font-bold bg-primary text-primary-foreground border-primary shrink-0">
                             待取餐
                           </Badge>
                         </div>
@@ -346,7 +346,7 @@ const WorkPage = () => {
                           </div>
                           <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                         </div>
-                        <Badge className="px-3 py-1 text-xs shrink-0 bg-blue-500 text-white border-blue-500">
+                        <Badge className="px-3 py-1 text-xs shrink-0 bg-primary/80 text-primary-foreground border-primary/80">
                           配送中
                         </Badge>
                       </div>
@@ -362,7 +362,7 @@ const WorkPage = () => {
             <Card className="glass-card p-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <Truck className="w-4 h-4 text-green-500" />
+                  <Truck className="w-4 h-4 text-primary" />
                   <h2 className="text-sm font-bold">配送完成</h2>
                 </div>
                 <span className="text-lg font-bold text-foreground">{deliveredOrders.length}</span>
@@ -383,7 +383,7 @@ const WorkPage = () => {
                           </div>
                           <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                         </div>
-                        <Badge className="px-3 py-1 text-xs shrink-0 bg-green-500 text-white border-green-500">
+                        <Badge className="px-3 py-1 text-xs shrink-0 bg-muted text-foreground border-border">
                           已完成
                         </Badge>
                       </div>
