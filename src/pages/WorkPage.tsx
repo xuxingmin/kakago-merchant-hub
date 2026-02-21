@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ChefHat, Clock, History } from "lucide-react";
+import { Truck, ChefHat, Clock, History, Power } from "lucide-react";
 import SwipeableOrderCard from "@/components/SwipeableOrderCard";
 import {
   Dialog,
@@ -162,15 +162,20 @@ const WorkPage = () => {
           <div className="ml-auto">
             <label className="flex items-center gap-2 cursor-pointer">
               <Switch checked={isOnline} onCheckedChange={setIsOnline} className="scale-75 data-[state=checked]:bg-primary" />
-              <div className="flex items-center gap-1.5">
-                {isOnline && (
+              {isOnline ? (
+                <div className="flex items-center gap-1.5">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                )}
-                <span className={`text-xs ${isOnline ? "text-foreground" : "text-muted-foreground/50"}`}>{isOnline ? "上线接单中" : "暂时休息中"}</span>
-              </div>
+                  <span className="text-xs text-foreground">上线接单中</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 animate-pulse">
+                  <Power className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-bold text-primary">上线</span>
+                </div>
+              )}
             </label>
           </div>
         </div>
