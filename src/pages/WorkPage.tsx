@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ChefHat, Bell } from "lucide-react";
+import { Truck, ChefHat, Clock } from "lucide-react";
 import SwipeableOrderCard from "@/components/SwipeableOrderCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Order {
   id: string;
@@ -32,6 +40,39 @@ const WorkPage = () => {
   const [orders, setOrders] = useState<Order[]>(mockOrders);
   const [activeTab, setActiveTab] = useState<"order" | "delivery">("order");
 
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  const [countdowns, setCountdowns] = useState<Record<string, number>>({});
+
+  // Initialize countdowns for pending orders
+  useEffect(() => {
+    const pending = orders.filter(o => o.status === "pending");
+    setCountdowns(prev => {
+      const next = { ...prev };
+      pending.forEach(o => {
+        if (!(o.id in next)) next[o.id] = 30;
+      });
+      return next;
+    });
+  }, [orders]);
+
+  // Tick countdowns every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdowns(prev => {
+        const next: Record<string, number> = {};
+        for (const [id, val] of Object.entries(prev)) {
+          if (val > 0) next[id] = val - 1;
+          else next[id] = 0;
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -50,6 +91,22 @@ const WorkPage = () => {
     setOrders(prev =>
       prev.map(o => (o.id === orderId ? { ...o, status: "making" } : o))
     );
+  };
+
+  const handleOpenCancel = (orderId: string) => {
+    setCancelOrderId(orderId);
+    setCancelReason("");
+    setCustomReason("");
+    setCancelDialogOpen(true);
+  };
+
+  const handleConfirmCancel = () => {
+    if (!cancelOrderId) return;
+    const reason = cancelReason === "其他" ? customReason : cancelReason;
+    if (!reason.trim()) return;
+    setOrders(prev => prev.filter(o => o.id !== cancelOrderId));
+    setCancelDialogOpen(false);
+    setCancelOrderId(null);
   };
 
   const handleFinishOrder = (orderId: string) => {
@@ -147,16 +204,17 @@ const WorkPage = () => {
       <div className="p-4 space-y-3">
         {activeTab === "order" ? (
           <>
-            {/* New Orders - Only show when manual accept mode */}
+            {/* Pending Orders - Only show when manual accept mode */}
             {!autoAccept && (
               <Card className="glass-card p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
-                    <Bell className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold">新订单</h2>
+                    <Clock className="w-4 h-4 text-primary" />
+                    <h2 className="text-sm font-bold">待确认订单</h2>
                   </div>
                   <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
                 </div>
+                <p className="text-xs text-muted-foreground mb-2">等待用户确认 · 如无法接单请在下方取消</p>
                 
                 {pendingOrders.length > 0 ? (
                   <div className="space-y-1.5">
@@ -173,18 +231,24 @@ const WorkPage = () => {
                             </div>
                             <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <Button
-                            onClick={() => handleAcceptOrder(order.id)}
-                            className="w-16 h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shrink-0"
-                          >
-                            接单
-                          </Button>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-xs font-mono text-destructive font-bold">
+                              {countdowns[order.id] !== undefined ? `${countdowns[order.id]}s` : "30s"}
+                            </span>
+                            <Button
+                              onClick={() => handleOpenCancel(order.id)}
+                              variant="destructive"
+                              className="w-16 h-10 text-sm font-bold"
+                            >
+                              取消
+                            </Button>
+                          </div>
                         </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6 text-muted-foreground">暂无新订单</div>
+                <div className="text-center py-6 text-muted-foreground">暂无待确认订单</div>
               )}
               </Card>
             )}
@@ -332,6 +396,50 @@ const WorkPage = () => {
           </>
         )}
       </div>
+
+      {/* Cancel Order Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>取消订单</DialogTitle>
+            <DialogDescription>
+              请选择取消原因（订单 #{cancelOrderId}）
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {["物料不足", "机器故障", "门店过载", "其他"].map((reason) => (
+              <button
+                key={reason}
+                onClick={() => setCancelReason(reason)}
+                className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${
+                  cancelReason === reason
+                    ? "border-primary bg-primary/10 text-foreground font-medium"
+                    : "border-border bg-secondary/50 text-muted-foreground"
+                }`}
+              >
+                {reason}
+              </button>
+            ))}
+            {cancelReason === "其他" && (
+              <Textarea
+                placeholder="请输入自定义取消原因..."
+                value={customReason}
+                onChange={(e) => setCustomReason(e.target.value)}
+                className="mt-2"
+                rows={2}
+              />
+            )}
+          </div>
+          <Button
+            onClick={handleConfirmCancel}
+            variant="destructive"
+            className="w-full mt-2"
+            disabled={!cancelReason || (cancelReason === "其他" && !customReason.trim())}
+          >
+            确认取消
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
