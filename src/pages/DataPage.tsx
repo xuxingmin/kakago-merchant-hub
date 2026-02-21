@@ -65,21 +65,25 @@ const DataPage = () => {
 
   return (
     <div className="p-4 pb-24 space-y-3">
-      {/* 今日数据 - 置顶 */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* 四宫格核心数据 */}
+      <div className="grid grid-cols-2 gap-2">
         <Card className="glass-card p-3 text-center">
-          <p className="text-xs text-muted-foreground">利润</p>
+          <p className="text-xs text-muted-foreground">今日利润</p>
           <span className="text-lg font-bold text-foreground">¥{profit.toLocaleString()}</span>
         </Card>
         <Card className="glass-card p-3 text-center">
-          <p className="text-xs text-muted-foreground">营业额</p>
-          <span className="text-lg font-bold text-primary">¥{revenue.toLocaleString()}</span>
+          <p className="text-xs text-muted-foreground">结算周利润</p>
+          <span className="text-lg font-bold text-primary">¥{(profit * 5.2).toLocaleString()}</span>
+        </Card>
+        <Card className="glass-card p-3 text-center">
+          <p className="text-xs text-muted-foreground">累计收益</p>
+          <span className="text-lg font-bold text-foreground">¥{(128600).toLocaleString()}</span>
         </Card>
         <Card
           className="glass-card p-3 text-center cursor-pointer active:scale-[0.97] transition-transform"
           onClick={() => setShowAllOrders(true)}
         >
-          <p className="text-xs text-muted-foreground">出杯</p>
+          <p className="text-xs text-muted-foreground">今日出杯</p>
           <span className="text-lg font-bold text-foreground">{totalCups}</span>
         </Card>
       </div>
