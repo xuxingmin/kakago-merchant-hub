@@ -171,9 +171,9 @@ const WorkPage = () => {
                   <span className="text-xs text-foreground">上线接单中</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 animate-pulse">
-                  <Power className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-bold text-primary">上线</span>
+                <div className="flex items-center gap-1.5 animate-bounce">
+                  <Power className="w-5 h-5 text-foreground animate-ping" />
+                  <span className="text-sm font-black text-foreground animate-pulse">上线</span>
                 </div>
               )}
             </label>
