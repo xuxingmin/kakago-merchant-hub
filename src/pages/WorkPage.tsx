@@ -301,9 +301,13 @@ const WorkPage = () => {
                             </div>
                             <p className="text-sm text-foreground">{formatItems(order.items)}</p>
                           </div>
-                          <Badge className="px-3 py-2 text-sm font-bold bg-primary/20 text-primary border-primary/30 shrink-0">
-                            制作中
-                          </Badge>
+                          <Button
+                            onClick={() => handleOpenCancel(order.id)}
+                            variant="destructive"
+                            className="w-20 h-8 text-xs font-bold shrink-0"
+                          >
+                            紧急取消
+                          </Button>
                         </div>
                       </div>
                     )
