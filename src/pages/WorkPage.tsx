@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ChefHat, Clock } from "lucide-react";
+import { Truck, ChefHat, Clock, History } from "lucide-react";
 import SwipeableOrderCard from "@/components/SwipeableOrderCard";
 import {
   Dialog,
@@ -369,19 +369,19 @@ const WorkPage = () => {
               )}
             </Card>
 
-            {/* Delivered Orders */}
+            {/* 历史订单 - 按时间倒序无限下拉 */}
             <Card className="glass-card p-3">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <Truck className="w-4 h-4 text-primary" />
-                  <h2 className="text-sm font-bold">配送完成</h2>
+                  <History className="w-4 h-4 text-primary" />
+                  <h2 className="text-sm font-bold">历史订单</h2>
                 </div>
                 <span className="text-lg font-bold text-foreground">{deliveredOrders.length}</span>
               </div>
               
               {deliveredOrders.length > 0 ? (
-                <div className="space-y-1.5">
-                  {deliveredOrders.map(order => (
+                <div className="space-y-1.5 max-h-[60vh] overflow-y-auto">
+                  {[...deliveredOrders].sort((a, b) => b.orderTime - a.orderTime).map(order => (
                     <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -406,7 +406,7 @@ const WorkPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-4 text-muted-foreground text-xs">暂无已完成订单</div>
+                <div className="text-center py-4 text-muted-foreground text-xs">暂无历史订单</div>
               )}
             </Card>
           </>
