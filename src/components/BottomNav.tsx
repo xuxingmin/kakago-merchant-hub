@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/", icon: Briefcase, label: "工作台" },
-  { path: "/data", icon: BarChart3, label: "数据" },
+  { path: "/data", icon: BarChart3, label: "经营" },
   { path: "/inventory", icon: Package, label: "库存" },
   { path: "/profile", icon: User, label: "我的" },
 ];
