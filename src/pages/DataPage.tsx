@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, TrendingUp, TrendingDown, ChevronRight, X } from "lucide-react";
+import { Star, TrendingUp, TrendingDown, ChevronRight, ClipboardList } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 // 固定的6种商品
@@ -33,12 +33,17 @@ const DataPage = () => {
   const [showAllOrders, setShowAllOrders] = useState(false);
 
   // 数据计算
-  const revenue = 12680; // 营业额
-  const revenueChange = 12; // 较昨日变化百分比
-  const couponTotal = 1580; // 核销券金总额
-  const merchantCouponShare = couponTotal * 0.4; // 商户承担40%
-  const profit = revenue * 0.5 - merchantCouponShare; // 利润 = 营业额50% - 商户券补贴
-  const profitChange = 8; // 利润较昨日变化
+  const revenue = 12680;
+  const revenueChange = 12;
+  const profit = revenue * 0.5;
+  const profitChange = 8;
+
+  // 待办事项
+  const todoItems = [
+    { id: 1, text: "补充燕麦奶库存（剩余12杯用量）", urgent: true },
+    { id: 2, text: "回复客户评价（2条未回复）", urgent: false },
+    { id: 3, text: "确认明日补货订单", urgent: false },
+  ];
 
   // 商品出杯统计
   const productCounts: Record<string, number> = {
@@ -103,16 +108,23 @@ const DataPage = () => {
           </div>
         </Card>
 
-        {/* 右下 - 核销券金 */}
+        {/* 待办事项 */}
         <Card className="glass-card p-3">
-          <p className="text-xs text-muted-foreground mb-1">核销券金</p>
-          <span className="text-xl font-bold text-warning">¥{merchantCouponShare.toLocaleString()}</span>
-          <p className="text-xs text-muted-foreground/60 mt-1">
-            平台补贴: ¥{(couponTotal * 0.6).toLocaleString()}
-          </p>
-          <p className="text-xs text-muted-foreground/60">
-            一起努力获客！
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <ClipboardList className="w-4 h-4 text-primary" />
+              <p className="text-xs font-bold text-foreground">待办</p>
+            </div>
+            <Badge className="bg-primary/20 text-primary text-xs">{todoItems.length}</Badge>
+          </div>
+          <div className="space-y-1.5">
+            {todoItems.map(item => (
+              <div key={item.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/30">
+                {item.urgent && <span className="w-1.5 h-1.5 rounded-full bg-destructive shrink-0" />}
+                <span className="text-xs text-foreground">{item.text}</span>
+              </div>
+            ))}
+          </div>
         </Card>
       </div>
 
