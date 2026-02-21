@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, TrendingUp, ChevronRight, ClipboardList, AlertTriangle } from "lucide-react";
+import { Star, ClipboardList, AlertTriangle } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const PRODUCTS = [
@@ -26,9 +26,13 @@ const mockOrders = [
   { id: "ORD-2024-0147", product: "cappuccino", price: 24, time: "12:40" },
 ];
 
+type TimePeriod = "day" | "week" | "month" | "year";
+const periodLabels: Record<TimePeriod, string> = { day: "日", week: "周", month: "月", year: "年" };
+
 const DataPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [showAllOrders, setShowAllOrders] = useState(false);
+  const [period, setPeriod] = useState<TimePeriod>("day");
 
   const revenue = 12680;
   const profit = revenue * 0.5;
@@ -61,26 +65,7 @@ const DataPage = () => {
 
   return (
     <div className="p-4 pb-24 space-y-3">
-      {/* 待办 - 最重要，置顶 */}
-      <Card className="glass-card p-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5">
-            <ClipboardList className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold text-foreground">待办</h2>
-          </div>
-          <Badge className="bg-primary/20 text-primary text-xs">{todoItems.length} 项</Badge>
-        </div>
-        <div className="space-y-1">
-          {todoItems.map(item => (
-            <div key={item.id} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${item.urgent ? "bg-destructive/10 border border-destructive/20" : "bg-secondary/30"}`}>
-              {item.urgent && <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0" />}
-              <span className={`text-xs ${item.urgent ? "text-foreground font-medium" : "text-muted-foreground"}`}>{item.text}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* 今日数据 - 一行两列压缩 */}
+      {/* 今日数据 - 置顶 */}
       <div className="grid grid-cols-3 gap-2">
         <Card className="glass-card p-3 text-center">
           <p className="text-xs text-muted-foreground">利润</p>
@@ -99,24 +84,56 @@ const DataPage = () => {
         </Card>
       </div>
 
-      {/* 商品出杯 - 紧凑网格 */}
+      {/* 待办 */}
       <Card className="glass-card p-3">
-        <h2 className="text-sm font-bold mb-2 text-foreground">商品出杯</h2>
-        <div className="grid grid-cols-3 gap-1.5">
-          {PRODUCTS.map((product) => (
-            <div
-              key={product.id}
-              className="text-center py-2 rounded-lg bg-secondary/30 cursor-pointer active:scale-[0.95] transition-transform"
-              onClick={() => setSelectedProduct(product.id)}
-            >
-              <p className="text-lg font-bold text-foreground">{productCounts[product.id]}</p>
-              <p className="text-xs text-muted-foreground">{product.name}</p>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <ClipboardList className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-bold text-foreground">待办</h2>
+          </div>
+          <Badge className="bg-primary/20 text-primary text-xs">{todoItems.length} 项</Badge>
+        </div>
+        <div className="space-y-1">
+          {todoItems.map(item => (
+            <div key={item.id} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${item.urgent ? "bg-destructive/10 border border-destructive/20" : "bg-secondary/30"}`}>
+              {item.urgent && <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0" />}
+              <span className={`text-xs ${item.urgent ? "text-foreground font-medium" : "text-muted-foreground"}`}>{item.text}</span>
             </div>
           ))}
         </div>
       </Card>
 
-      {/* 客户评价 - 精简 */}
+      {/* 销售分析 - 紧凑+时间切换 */}
+      <Card className="glass-card p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-sm font-bold text-foreground">销售分析</h2>
+          <div className="flex bg-secondary/40 rounded-md p-0.5">
+            {(Object.keys(periodLabels) as TimePeriod[]).map(key => (
+              <button
+                key={key}
+                onClick={() => setPeriod(key)}
+                className={`px-2.5 py-0.5 text-xs rounded transition-colors ${period === key ? "bg-primary text-primary-foreground font-medium" : "text-muted-foreground"}`}
+              >
+                {periodLabels[key]}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-1">
+          {PRODUCTS.map((product) => (
+            <div
+              key={product.id}
+              className="text-center py-1.5 rounded-md bg-secondary/30 cursor-pointer active:scale-[0.95] transition-transform"
+              onClick={() => setSelectedProduct(product.id)}
+            >
+              <p className="text-base font-bold text-foreground leading-tight">{productCounts[product.id]}</p>
+              <p className="text-[10px] text-muted-foreground">{product.name}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* 客户评价 */}
       <Card className="glass-card p-3">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-sm font-bold text-foreground">客户评价</h2>
