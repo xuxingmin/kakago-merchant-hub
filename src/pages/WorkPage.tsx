@@ -36,7 +36,6 @@ const mockOrders: Order[] = [
 
 const WorkPage = () => {
   const [isOnline, setIsOnline] = useState(true);
-  const [autoAccept, setAutoAccept] = useState(false);
   const [orders, setOrders] = useState<Order[]>(mockOrders);
   const [activeTab, setActiveTab] = useState<"order" | "delivery">("order");
 
@@ -137,20 +136,17 @@ const WorkPage = () => {
     );
   };
 
-  // When autoAccept is on, pending orders are treated as making
-  const pendingOrders = autoAccept ? [] : orders.filter(o => o.status === "pending");
-  const makingOrders = autoAccept 
-    ? orders.filter(o => o.status === "pending" || o.status === "making")
-    : orders.filter(o => o.status === "making");
+  const pendingOrders = orders.filter(o => o.status === "pending");
+  const makingOrders = orders.filter(o => o.status === "making");
   const readyOrders = orders.filter(o => o.status === "ready");
   const deliveringOrders = orders.filter(o => o.status === "delivering");
   const deliveredOrders = orders.filter(o => o.status === "delivered");
 
-  // Sort by wait time (longest first = higher orderTime value)
+  // Sort by wait time (longest first)
   const sortedMakingOrders = [...makingOrders].sort((a, b) => b.orderTime - a.orderTime);
   const sortedReadyOrders = [...readyOrders].sort((a, b) => b.orderTime - a.orderTime);
   
-  // Combined making + ready for the "制作中" section (making first, then ready, both sorted by wait time)
+  // 制作中区域：制作中订单在前，待取餐订单在后
   const productionOrders = [...sortedMakingOrders, ...sortedReadyOrders];
 
   return (
@@ -163,14 +159,10 @@ const WorkPage = () => {
             <span className="text-xs text-muted-foreground">中关村店</span>
             <span className="text-xs text-muted-foreground">KKG-0012</span>
           </div>
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="ml-auto">
             <label className="flex items-center gap-1 cursor-pointer">
               <Switch checked={isOnline} onCheckedChange={setIsOnline} className="scale-75 data-[state=checked]:bg-primary" />
-              <span className={`text-xs ${isOnline ? "text-foreground" : "text-muted-foreground/50"}`}>{isOnline ? "营业" : "暂停"}</span>
-            </label>
-            <label className="flex items-center gap-1 cursor-pointer">
-              <Switch checked={autoAccept} onCheckedChange={setAutoAccept} className="scale-75 data-[state=checked]:bg-primary" />
-              <span className={`text-xs ${autoAccept ? "text-foreground" : "text-muted-foreground/50"}`}>自动</span>
+              <span className={`text-xs ${isOnline ? "text-foreground" : "text-muted-foreground/50"}`}>{isOnline ? "上线接单中" : "暂时休息中"}</span>
             </label>
           </div>
         </div>
@@ -204,57 +196,50 @@ const WorkPage = () => {
       <div className="p-4 space-y-3">
         {activeTab === "order" ? (
           <>
-            {/* 待确认 - 手动接单模式下显示，用户30s内可取消 */}
-            {!autoAccept && (
-              <Card className="glass-card p-3">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold">待确认</h2>
-                    <span className="text-xs text-muted-foreground ml-1">用户30s内可取消</span>
-                  </div>
-                  <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
+            {/* 待确认 - 用户30s内可取消 */}
+            <Card className="glass-card p-3">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <h2 className="text-sm font-bold">待确认</h2>
+                  <span className="text-xs text-muted-foreground ml-1">用户30s内可取消</span>
                 </div>
-                
-                {pendingOrders.length > 0 ? (
-                  <div className="space-y-1.5">
-                    {pendingOrders.map(order => (
-                      <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-0.5">
-                              <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span>{formatTime(order.orderTime)}</span>
-                                <span>共{getTotalQty(order.items)}杯</span>
-                              </div>
-                            </div>
-                            <div className="flex flex-wrap gap-x-2 gap-y-0.5">
-                              {formatItems(order.items).map((item, i) => (
-                                <span key={i} className="text-sm text-foreground">{item}</span>
-                              ))}
+                <span className="text-lg font-bold text-foreground">{pendingOrders.length}</span>
+              </div>
+              
+              {pendingOrders.length > 0 ? (
+                <div className="space-y-1.5">
+                  {pendingOrders.map(order => (
+                    <div key={order.id} className="px-2 py-1.5 rounded-lg bg-secondary/50 border border-border">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-0.5">
+                            <span className="font-mono text-lg font-bold text-foreground">#{order.id}</span>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>{formatTime(order.orderTime)}</span>
+                              <span>共{getTotalQty(order.items)}杯</span>
                             </div>
                           </div>
-                          <div className="flex flex-col items-center gap-1 shrink-0">
-                            <span className="text-xs font-mono text-foreground font-bold">
-                              {countdowns[order.id] !== undefined ? `${countdowns[order.id]}s` : "30s"}
-                            </span>
-                            <Button
-                              onClick={() => handleOpenCancel(order.id)}
-                              className="w-16 h-8 text-sm font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
-                            >
-                              取消
-                            </Button>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {formatItems(order.items).map((item, i) => (
+                              <span key={i} className="text-sm text-foreground">{item}</span>
+                            ))}
                           </div>
                         </div>
+                        <Button
+                          onClick={() => handleOpenCancel(order.id)}
+                          className="w-20 h-9 text-xs font-bold shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                        >
+                          取消 {countdowns[order.id] !== undefined ? `${countdowns[order.id]}s` : "30s"}
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-6 text-muted-foreground">暂无待确认</div>
               )}
-              </Card>
-            )}
+            </Card>
 
             {/* 制作中 - 完成制作→小票扫码→骑手取货，全自动流转 */}
             <Card className="glass-card p-3">
@@ -291,9 +276,12 @@ const WorkPage = () => {
                               ))}
                             </div>
                           </div>
-                          <Badge className="px-3 py-2 text-sm font-bold bg-primary text-primary-foreground border-primary shrink-0">
+                          <Button
+                            disabled
+                            className="w-20 h-9 text-xs font-bold shrink-0 bg-primary text-primary-foreground opacity-80"
+                          >
                             待取餐
-                          </Badge>
+                          </Button>
                         </div>
                       </SwipeableOrderCard>
                     ) : (
@@ -315,7 +303,7 @@ const WorkPage = () => {
                           </div>
                           <Button
                             onClick={() => handleOpenCancel(order.id)}
-                            className="w-20 h-8 text-xs font-bold shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                            className="w-20 h-9 text-xs font-bold shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground"
                           >
                             紧急取消
                           </Button>
