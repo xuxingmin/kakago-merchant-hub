@@ -160,9 +160,17 @@ const WorkPage = () => {
             <span className="text-xs text-muted-foreground">KKG-0012</span>
           </div>
           <div className="ml-auto">
-            <label className="flex items-center gap-1 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer">
               <Switch checked={isOnline} onCheckedChange={setIsOnline} className="scale-75 data-[state=checked]:bg-primary" />
-              <span className={`text-xs ${isOnline ? "text-foreground" : "text-muted-foreground/50"}`}>{isOnline ? "上线接单中" : "暂时休息中"}</span>
+              <div className="flex items-center gap-1.5">
+                {isOnline && (
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  </span>
+                )}
+                <span className={`text-xs ${isOnline ? "text-foreground" : "text-muted-foreground/50"}`}>{isOnline ? "上线接单中" : "暂时休息中"}</span>
+              </div>
             </label>
           </div>
         </div>
