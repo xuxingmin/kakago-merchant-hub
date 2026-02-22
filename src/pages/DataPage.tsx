@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ChevronRight, X, CheckCircle2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -187,6 +188,7 @@ const PromoBanner = () => {
 };
 
 const DataPage = () => {
+  const navigate = useNavigate();
   const [showProfitDetail, setShowProfitDetail] = useState(false);
   const [showSettlement, setShowSettlement] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -340,7 +342,7 @@ const DataPage = () => {
         </Card>
         <Card
           className="bg-primary px-4 py-4 rounded-xl cursor-pointer active:scale-[0.97] transition-transform"
-          onClick={() => setShowSettlement(true)}
+          onClick={() => navigate("/settlement")}
         >
           <p className="text-xs text-primary-foreground/70 mb-1">待结算</p>
           <p className="text-lg font-bold text-primary-foreground mt-2 flex items-center gap-1">
@@ -434,7 +436,7 @@ const DataPage = () => {
                 {settlementStatus === "pending" ? (
                   <Button
                     className="w-full h-12 text-sm font-bold bg-primary hover:bg-primary/90"
-                    onClick={() => setShowSettlement(false)}
+                    onClick={() => { setShowSettlement(false); navigate("/settlement"); }}
                   >
                     前往待结算页面
                   </Button>
