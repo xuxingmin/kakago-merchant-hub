@@ -424,7 +424,7 @@ const DataPage = () => {
                 {/* Explanation box */}
                 <div className="mt-3 p-3 rounded-xl bg-secondary/40 border border-border/30">
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    【KAKAGO 结算规则】商户自正式营业日起，系统默认采用 T+7 周期结算模式。账期内的有效订单利润，将在满7个自然日后转入待结算账户。请仔细核对明细，无误后点击下方按钮完成对账。
+                    【KAKAGO 结算规则】商户自正式营业日起，系统默认采用 T+7 周期结算模式。账期内的有效订单利润，将在满7个自然日后转入待结算账户。请仔细核对明细，无误后进入「经营 -&gt; 待结算」卡片进行对账提现。
                   </p>
                 </div>
               </div>
@@ -434,9 +434,9 @@ const DataPage = () => {
                 {settlementStatus === "pending" ? (
                   <Button
                     className="w-full h-12 text-sm font-bold bg-primary hover:bg-primary/90"
-                    onClick={() => setShowConfirmModal(true)}
+                    onClick={() => setShowSettlement(false)}
                   >
-                    去对账结算
+                    前往待结算页面
                   </Button>
                 ) : (
                   <Button
