@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +74,7 @@ const InventoryPage = () => {
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
   const [replenishItems, setReplenishItems] = useState<Record<string, number>>({});
 
-  const { data: rawMaterials = [] } = useQuery({
+  const { data: rawMaterials = [], refetch: refetchRaw } = useQuery({
     queryKey: ["raw_materials"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -84,9 +84,10 @@ const InventoryPage = () => {
       if (error) throw error;
       return data;
     },
+    refetchInterval: 30000,
   });
 
-  const { data: packagingMaterials = [] } = useQuery({
+  const { data: packagingMaterials = [], refetch: refetchPack } = useQuery({
     queryKey: ["packaging_materials"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -96,7 +97,18 @@ const InventoryPage = () => {
       if (error) throw error;
       return data;
     },
+    refetchInterval: 30000,
   });
+
+  // Realtime subscription for auto-updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('inventory-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'raw_materials' }, () => refetchRaw())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'packaging_materials' }, () => refetchPack())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [refetchRaw, refetchPack]);
 
   const rawItems: GridItem[] = rawMaterials.map((r) => ({
     id: r.id,
