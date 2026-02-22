@@ -11,35 +11,20 @@ import {
 } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 
-// --- Mock Data with specific X-axis labels ---
+// --- Mock Data (profit only) ---
 const dailyChartData = [0, 4, 8, 12, 16, 20, 24].map((h) => ({
   label: `${h}时`,
   profit: Math.round(800 + Math.random() * 1200),
-  cumulative: 0,
-  orders: Math.round(5 + Math.random() * 25),
-})).map((item, i, a) => ({
-  ...item,
-  cumulative: a.slice(0, i + 1).reduce((s, v) => s + v.profit, 0),
 }));
 
 const weeklyChartData = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"].map((d) => ({
   label: d,
   profit: Math.round(3500 + Math.random() * 4000),
-  cumulative: 0,
-  orders: Math.round(100 + Math.random() * 80),
-})).map((item, i, a) => ({
-  ...item,
-  cumulative: a.slice(0, i + 1).reduce((s, v) => s + v.profit, 0),
 }));
 
-const monthlyChartData = [1, 5, 10, 15, 20, 25, 31].map((d) => ({
-  label: `${d}日`,
+const monthlyChartData = Array.from({ length: 31 }, (_, i) => ({
+  label: `${i + 1}`,
   profit: Math.round(3000 + Math.random() * 5000),
-  cumulative: 0,
-  orders: Math.round(80 + Math.random() * 100),
-})).map((item, i, a) => ({
-  ...item,
-  cumulative: a.slice(0, i + 1).reduce((s, v) => s + v.profit, 0),
 }));
 
 // --- Other mock data (unchanged) ---
@@ -72,8 +57,6 @@ type TimePeriod = "daily" | "weekly" | "monthly";
 
 const chartConfig = {
   profit: { label: "利润", color: "#a855f7" },
-  cumulative: { label: "累计收益", color: "#06b6d4" },
-  orders: { label: "订单数", color: "#eab308" },
 };
 
 const DataPage = () => {
@@ -143,11 +126,11 @@ const DataPage = () => {
         </Card>
       </div>
 
-      {/* 利润趋势 Chart with its own toggle */}
-      <Card className="glass-card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold text-foreground">利润趋势</h2>
-          <div className="flex bg-secondary/50 rounded-lg p-0.5">
+      {/* 利润趋势 Chart */}
+      <Card className="glass-card p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xs font-bold text-foreground">利润趋势</h2>
+          <div className="flex bg-secondary/50 rounded-md p-0.5">
             {([
               { key: "daily", label: "日" },
               { key: "weekly", label: "周" },
@@ -156,7 +139,7 @@ const DataPage = () => {
               <button
                 key={tab.key}
                 onClick={() => setChartPeriod(tab.key)}
-                className={`px-3 py-1 text-[11px] font-medium rounded-md transition-all ${
+                className={`px-2.5 py-0.5 text-[10px] font-medium rounded transition-all ${
                   chartPeriod === tab.key
                     ? "text-primary border-b-2 border-primary bg-primary/10"
                     : "text-muted-foreground"
@@ -167,24 +150,29 @@ const DataPage = () => {
             ))}
           </div>
         </div>
-        <ChartContainer config={chartConfig} className="h-[220px] w-full">
+        <ChartContainer config={chartConfig} className="h-[150px] w-full">
           <LineChart
             key={chartPeriod}
             data={chartData}
-            margin={{ top: 5, right: 5, left: -15, bottom: 5 }}
+            margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.2} />
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: chartPeriod === "monthly" ? 7 : 9, fill: "hsl(var(--muted-foreground))" }}
               axisLine={{ stroke: "hsl(var(--border))" }}
               tickLine={false}
+              interval={0}
+              angle={chartPeriod === "monthly" ? -45 : 0}
+              textAnchor={chartPeriod === "monthly" ? "end" : "middle"}
+              height={chartPeriod === "monthly" ? 25 : 20}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`}
+              width={35}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Line
@@ -193,47 +181,12 @@ const DataPage = () => {
               name="利润"
               stroke="#a855f7"
               strokeWidth={2}
-              dot={{ r: 3, fill: "#a855f7" }}
-              activeDot={{ r: 5 }}
-              animationDuration={600}
-            />
-            <Line
-              type="monotone"
-              dataKey="cumulative"
-              name="累计收益"
-              stroke="#06b6d4"
-              strokeWidth={2}
-              dot={{ r: 3, fill: "#06b6d4" }}
-              activeDot={{ r: 5 }}
-              animationDuration={600}
-            />
-            <Line
-              type="monotone"
-              dataKey="orders"
-              name="订单数"
-              stroke="#eab308"
-              strokeWidth={1.5}
-              strokeDasharray="4 2"
-              dot={false}
-              activeDot={{ r: 3 }}
-              animationDuration={600}
+              dot={{ r: chartPeriod === "monthly" ? 1.5 : 3, fill: "#a855f7" }}
+              activeDot={{ r: 4 }}
+              animationDuration={500}
             />
           </LineChart>
         </ChartContainer>
-        <div className="flex items-center justify-center gap-5 mt-2">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 rounded-full inline-block" style={{ backgroundColor: "#a855f7" }} />
-            <span className="text-[10px] text-muted-foreground">利润</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-0.5 rounded-full inline-block" style={{ backgroundColor: "#06b6d4" }} />
-            <span className="text-[10px] text-muted-foreground">累计收益</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-[2px] inline-block border-t border-dashed" style={{ borderColor: "#eab308" }} />
-            <span className="text-[10px] text-muted-foreground">订单数</span>
-          </div>
-        </div>
       </Card>
 
       {/* Bottom 2-card row */}
