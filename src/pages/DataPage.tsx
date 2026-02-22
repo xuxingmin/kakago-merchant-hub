@@ -14,8 +14,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 // --- Generate date-based mock data ---
 const today = new Date();
 
-const dailyChartData = [0, 4, 8, 12, 16, 20, 24].map((h) => ({
-  label: `${h}时`,
+const dailyChartData = Array.from({ length: 16 }, (_, i) => ({
+  label: `${6 + i}`,
   profit: Math.round(800 + Math.random() * 1200),
 }));
 
