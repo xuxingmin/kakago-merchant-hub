@@ -1,184 +1,55 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Package, Phone, Plus, Minus, Milk, Coffee } from "lucide-react";
+import { AlertTriangle, Package, Milk, Coffee, Phone, Plus, Minus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-
-// Hardcoded store_id for demo
-const DEMO_STORE_ID = "00000000-0000-0000-0000-000000000001";
-
-const getStockStatus = (current: number, max: number) => {
-  const pct = (current / max) * 100;
-  if (pct <= 20) return { color: "destructive" as const, text: "紧缺" };
-  if (pct <= 40) return { color: "warning" as const, text: "偏低" };
-  return { color: "success" as const, text: "充足" };
-};
-
-const badgeClass = (color: "destructive" | "warning" | "success") =>
-  color === "destructive"
-    ? "border-destructive text-destructive"
-    : color === "warning"
-    ? "border-warning text-warning"
-    : "border-success text-success";
-
-const progressClass = (color: "destructive" | "warning" | "success") =>
-  color === "destructive"
-    ? "[&>div]:bg-destructive"
-    : color === "warning"
-    ? "[&>div]:bg-warning"
-    : "[&>div]:bg-success";
-
-interface GridItem {
-  id: string;
-  name: string;
-  current: number;
-  max: number;
-  unit?: string;
-  icon?: string;
-}
-
-const iconMap: Record<string, React.ReactNode> = {
-  Milk: <Milk className="w-4 h-4 text-muted-foreground" />,
-  Coffee: <Coffee className="w-4 h-4 text-muted-foreground" />,
-};
-
-const RawMaterialRow = ({ item }: { item: GridItem }) => {
-  const status = getStockStatus(item.current, item.max);
-  const pct = (item.current / item.max) * 100;
-
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          {item.icon && iconMap[item.icon] ? iconMap[item.icon] : <Package className="w-4 h-4 text-muted-foreground" />}
-          <span className="text-sm font-medium">{item.name}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-lg font-bold">{item.current}</span>
-          <span className="text-xs text-muted-foreground">/ {item.max} {item.unit || ""}</span>
-          <Badge
-            variant="outline"
-            className={`text-[10px] px-1.5 py-0 h-4 ${badgeClass(status.color)}`}
-          >
-            {status.text}
-          </Badge>
-        </div>
-      </div>
-      <Progress
-        value={pct}
-        className={`h-1.5 ${progressClass(status.color)}`}
-      />
-    </div>
-  );
-};
-
-const InventoryGridCard = ({ item }: { item: GridItem }) => {
-  const status = getStockStatus(item.current, item.max);
-  const pct = (item.current / item.max) * 100;
-
-  return (
-    <div className="p-1.5 rounded bg-secondary/30">
-      <div className="flex items-center justify-between mb-0.5">
-        <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
-        <Badge
-          variant="outline"
-          className={`text-[8px] px-1 py-0 h-3 ${badgeClass(status.color)}`}
-        >
-          {status.text}
-        </Badge>
-      </div>
-      <div className="flex items-baseline gap-0.5">
-        <span className="text-sm font-bold">{item.current}</span>
-        <span className="text-[8px] text-muted-foreground">
-          /{item.max}{item.unit ? ` ${item.unit}` : ""}
-        </span>
-      </div>
-      <Progress
-        value={pct}
-        className={`h-1 mt-0.5 ${progressClass(status.color)}`}
-      />
-    </div>
-  );
-};
 
 const InventoryPage = () => {
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
   const [replenishItems, setReplenishItems] = useState<Record<string, number>>({});
 
-  const { data: rawMaterials = [], refetch: refetchRaw } = useQuery({
-    queryKey: ["raw_materials"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("raw_materials")
-        .select("*")
-        .eq("store_id", DEMO_STORE_ID);
-      if (error) throw error;
-      return data;
-    },
-    refetchInterval: 30000,
-  });
+  const inventory = {
+    milk: { current: 15, max: 50, unit: "L", name: "牛奶", icon: Milk, usage: 0.2 },
+    beans: { current: 8, max: 20, unit: "kg", name: "咖啡豆", icon: Coffee, usage: 0.015 },
+  };
 
-  const { data: packagingMaterials = [], refetch: refetchPack } = useQuery({
-    queryKey: ["packaging_materials"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("packaging_materials")
-        .select("*")
-        .eq("store_id", DEMO_STORE_ID);
-      if (error) throw error;
-      return data;
-    },
-    refetchInterval: 30000,
-  });
+  const packaging = {
+    hotCups: { current: 60, max: 300, name: "热杯" },
+    coldCups: { current: 80, max: 300, name: "冰杯" },
+    hotLids: { current: 50, max: 300, name: "热杯盖" },
+    coldLids: { current: 70, max: 300, name: "冰杯盖" },
+    paperBags: { current: 100, max: 200, name: "纸袋" },
+    sleeves: { current: 80, max: 300, name: "杯套" },
+    holders: { current: 40, max: 200, name: "杯托" },
+    straws: { current: 200, max: 500, name: "吸管" },
+    sealStickers: { current: 150, max: 400, name: "封口贴纸" },
+  };
 
-  // Realtime subscription for auto-updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('inventory-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'raw_materials' }, () => refetchRaw())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'packaging_materials' }, () => refetchPack())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [refetchRaw, refetchPack]);
+  const calculateAvailable = () => {
+    const milkLimit = Math.floor(inventory.milk.current / inventory.milk.usage);
+    const beansLimit = Math.floor(inventory.beans.current / inventory.beans.usage);
+    const cupsLimit = Math.min(packaging.hotCups.current, packaging.coldCups.current);
+    const lidsLimit = Math.min(packaging.hotLids.current, packaging.coldLids.current);
+    return Math.min(milkLimit, beansLimit, cupsLimit, lidsLimit);
+  };
 
-  const rawItems: GridItem[] = rawMaterials.map((r) => ({
-    id: r.id,
-    name: r.name,
-    current: Number(r.current_amount),
-    max: Number(r.max_amount),
-    unit: r.unit,
-    icon: r.icon,
-  }));
-
-  const packItems: GridItem[] = packagingMaterials.map((p) => ({
-    id: p.id,
-    name: p.name,
-    current: p.current_amount,
-    max: p.max_amount,
-  }));
-
-  const availableProducts = useMemo(() => {
-    if (!rawMaterials.length || !packagingMaterials.length) return 0;
-    const rawLimits = rawMaterials.map((r) =>
-      Math.floor(Number(r.current_amount) / Number(r.usage_per_cup))
-    );
-    const packLimits = packagingMaterials.map((p) => p.current_amount);
-    return Math.min(...rawLimits, ...packLimits);
-  }, [rawMaterials, packagingMaterials]);
-
+  const availableProducts = calculateAvailable();
   const isLowStock = availableProducts < 50;
 
-  const allItems = [...rawItems, ...packItems];
+  const getStockStatus = (current: number, max: number) => {
+    const percentage = (current / max) * 100;
+    if (percentage <= 20) return { color: "destructive", text: "紧缺" };
+    if (percentage <= 40) return { color: "warning", text: "偏低" };
+    return { color: "success", text: "充足" };
+  };
 
   const handleReplenishChange = (key: string, delta: number) => {
-    setReplenishItems((prev) => ({
+    setReplenishItems(prev => ({
       ...prev,
-      [key]: Math.max(0, (prev[key] || 0) + delta),
+      [key]: Math.max(0, (prev[key] || 0) + delta)
     }));
   };
 
@@ -188,9 +59,15 @@ const InventoryPage = () => {
     setReplenishItems({});
   };
 
+  const allItems = [
+    ...Object.entries(inventory).map(([k, v]) => ({ key: k, ...v })),
+    ...Object.entries(packaging).map(([k, v]) => ({ key: k, ...v, unit: "个" })),
+  ];
+
   return (
     <div className="p-3 pb-20 space-y-2">
       {/* Available Count */}
+
       <Card className={`glass-card px-3 py-2 ${isLowStock ? "border-destructive" : "border-success"}`}>
         {isLowStock && (
           <div className="flex items-center gap-1 text-destructive">
@@ -212,7 +89,7 @@ const InventoryPage = () => {
 
       {/* Supply Chain & Emergency Replenish */}
       <div className="grid grid-cols-2 gap-2">
-        <SmartSupplyChainWidget
+        <SmartSupplyChainWidget 
           isRestockActive={true}
           estimatedDays={6}
           inboundItems={[
@@ -221,7 +98,8 @@ const InventoryPage = () => {
             { name: "热杯", quantity: "1000个" },
           ]}
         />
-        <Button
+
+        <Button 
           className="text-sm font-bold bg-primary hover:bg-primary/90 h-auto py-2"
           onClick={() => setShowReplenishDialog(true)}
         >
@@ -237,13 +115,44 @@ const InventoryPage = () => {
           库存明细
         </h2>
 
-        {/* Raw Materials - List row format */}
+        {/* Raw Materials */}
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
-          <div className="space-y-3">
-            {rawItems.map((item) => (
-              <RawMaterialRow key={item.id} item={item} />
-            ))}
+          <div className="space-y-2">
+            {Object.values(inventory).map((item) => {
+              const status = getStockStatus(item.current, item.max);
+              const percentage = (item.current / item.max) * 100;
+              return (
+                <div key={item.name} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <item.icon className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">{item.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base font-bold">{item.current}</span>
+                      <span className="text-muted-foreground text-xs">/ {item.max} {item.unit}</span>
+                      <Badge
+                        variant={status.color === "success" ? "default" : status.color === "warning" ? "secondary" : "destructive"}
+                        className={`text-[10px] px-1.5 py-0 ${
+                          status.color === "success" ? "bg-success" :
+                          status.color === "warning" ? "bg-warning text-warning-foreground" : ""
+                        }`}
+                      >
+                        {status.text}
+                      </Badge>
+                    </div>
+                  </div>
+                  <Progress
+                    value={percentage}
+                    className={`h-1.5 ${
+                      status.color === "destructive" ? "[&>div]:bg-destructive" :
+                      status.color === "warning" ? "[&>div]:bg-warning" : "[&>div]:bg-success"
+                    }`}
+                  />
+                </div>
+              );
+            })}
           </div>
         </Card>
 
@@ -251,9 +160,37 @@ const InventoryPage = () => {
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">包材</h3>
           <div className="grid grid-cols-3 gap-1.5">
-            {packItems.map((item) => (
-              <InventoryGridCard key={item.id} item={item} />
-            ))}
+            {Object.values(packaging).map((item) => {
+              const status = getStockStatus(item.current, item.max);
+              const percentage = (item.current / item.max) * 100;
+              return (
+                <div key={item.name} className="p-1.5 rounded bg-secondary/30">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[8px] px-1 py-0 h-3 ${
+                        status.color === "destructive" ? "border-destructive text-destructive" :
+                        status.color === "warning" ? "border-warning text-warning" : "border-success text-success"
+                      }`}
+                    >
+                      {status.text}
+                    </Badge>
+                  </div>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-sm font-bold">{item.current}</span>
+                    <span className="text-[8px] text-muted-foreground">/{item.max}</span>
+                  </div>
+                  <Progress
+                    value={percentage}
+                    className={`h-1 mt-0.5 ${
+                      status.color === "destructive" ? "[&>div]:bg-destructive" :
+                      status.color === "warning" ? "[&>div]:bg-warning" : "[&>div]:bg-success"
+                    }`}
+                  />
+                </div>
+              );
+            })}
           </div>
         </Card>
       </div>
@@ -264,38 +201,37 @@ const InventoryPage = () => {
           <DialogHeader>
             <DialogTitle>紧急补货申请</DialogTitle>
           </DialogHeader>
-
+          
           <div className="space-y-2 py-2">
             {allItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-2 rounded bg-secondary/30">
+              <div key={item.key} className="flex items-center justify-between p-2 rounded bg-secondary/30">
                 <span className="text-sm font-medium">{item.name}</span>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => handleReplenishChange(item.id, -1)}
+                    onClick={() => handleReplenishChange(item.key, -1)}
                   >
                     <Minus className="w-3 h-3" />
                   </Button>
-                  <span className="w-6 text-center font-bold text-sm">
-                    {replenishItems[item.id] || 0}
-                  </span>
+                  <span className="w-6 text-center font-bold text-sm">{replenishItems[item.key] || 0}</span>
                   <Button
                     variant="outline"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => handleReplenishChange(item.id, 1)}
+                    onClick={() => handleReplenishChange(item.key, 1)}
                   >
                     <Plus className="w-3 h-3" />
                   </Button>
+                  <span className="text-xs text-muted-foreground w-5">{item.unit}</span>
                 </div>
               </div>
             ))}
           </div>
 
           <div className="p-2 rounded bg-warning/10 border border-warning/30">
-            <p className="text-sm text-warning font-medium">临时补货费用：¥50</p>
+            <p className="text-sm text-warning font-medium">⚠️ 临时补货费用：¥50</p>
             <p className="text-xs text-muted-foreground">费用将从每周结算自动扣除</p>
           </div>
 
