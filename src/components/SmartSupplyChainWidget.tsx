@@ -80,9 +80,10 @@ const SmartSupplyChainWidget = ({
   return (
     <>
       <Card
-        className="relative bg-background border-2 border-primary px-3 py-2 cursor-pointer transition-all hover:border-primary/80 animate-pulse"
+        className="relative border-2 border-primary px-3 py-2 cursor-pointer transition-all hover:border-primary/80"
         style={{
           boxShadow: "0 0 15px rgba(127, 0, 255, 0.3), inset 0 0 10px rgba(127, 0, 255, 0.1)",
+          animation: "breathe-bw 2s ease-in-out infinite",
         }}
         onClick={handleWidgetClick}
       >

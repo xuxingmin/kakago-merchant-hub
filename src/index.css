@@ -115,4 +115,13 @@
       box-shadow: 0 0 20px hsl(270 100% 50% / 0.8);
     }
   }
+
+  @keyframes breathe-bw {
+    0%, 100% {
+      background-color: hsl(0 0% 0%);
+    }
+    50% {
+      background-color: hsl(0 0% 18%);
+    }
+  }
 }
