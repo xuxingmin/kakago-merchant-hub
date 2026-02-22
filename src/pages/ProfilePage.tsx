@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Store,
-  MessageSquare,
+  UserPlus,
   ChevronRight,
   Coffee,
   TrendingUp,
@@ -43,7 +43,7 @@ const recentReviews = [
 const ProfilePage = () => {
   const [showStoreSheet, setShowStoreSheet] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
-  const [showFeedbackSheet, setShowFeedbackSheet] = useState(false);
+  const [showInviteSheet, setShowInviteSheet] = useState(false);
   const [showTodoSheet, setShowTodoSheet] = useState(false);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -200,14 +200,14 @@ const ProfilePage = () => {
 
         <button
           className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
-          onClick={() => setShowFeedbackSheet(true)}
+          onClick={() => setShowInviteSheet(true)}
         >
-          <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
-            <MessageSquare className="w-4 h-4 text-muted-foreground" />
+          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
+            <UserPlus className="w-4 h-4 text-primary" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium">意见反馈</p>
-            <p className="text-xs text-muted-foreground">提交问题或建议</p>
+            <p className="text-sm font-medium">邀请伙伴加入</p>
+            <p className="text-xs text-muted-foreground">邀请店员加入系统，自助上下线</p>
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
@@ -300,18 +300,29 @@ const ProfilePage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Feedback Sheet */}
-      <Sheet open={showFeedbackSheet} onOpenChange={setShowFeedbackSheet}>
-        <SheetContent side="bottom" className="bg-background border-t border-border h-[50vh]">
+      {/* 邀请伙伴 Sheet */}
+      <Sheet open={showInviteSheet} onOpenChange={setShowInviteSheet}>
+        <SheetContent side="bottom" className="bg-background border-t border-border h-[60vh]">
           <SheetHeader className="pb-3">
-            <SheetTitle>意见反馈</SheetTitle>
+            <SheetTitle>邀请伙伴加入</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">反馈内容</Label>
-              <Textarea placeholder="请描述您遇到的问题或建议..." className="min-h-[120px]" />
+          <div className="space-y-4 overflow-y-auto max-h-[calc(60vh-80px)] pb-4">
+            <p className="text-sm text-muted-foreground">
+              邀请门店伙伴注册并加入此系统，让每位店员都可以自主上线/下线，无需老板在场操作。
+            </p>
+            <div className="space-y-2">
+              {["伙伴可自助上线/下线门店", "伙伴可查看并接单", "订单操作记录清晰可追溯", "老板可随时管理伙伴权限"].map((item, i) => (
+                <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-secondary/30">
+                  <span className="text-primary text-sm">✓</span>
+                  <span className="text-sm text-foreground">{item}</span>
+                </div>
+              ))}
             </div>
-            <Button className="w-full bg-primary">提交反馈</Button>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">伙伴手机号</Label>
+              <Input placeholder="输入伙伴手机号" className="h-9 text-sm" />
+            </div>
+            <Button className="w-full bg-primary">发送邀请</Button>
           </div>
         </SheetContent>
       </Sheet>
