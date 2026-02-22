@@ -3,37 +3,88 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Package, Milk, Coffee, Phone, Plus, Minus } from "lucide-react";
+import { AlertTriangle, Package, Phone, Plus, Minus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+const STORE_ID = "00000000-0000-0000-0000-000000000001";
+
+interface RawMaterial {
+  id: string;
+  name: string;
+  icon: string;
+  unit: string;
+  current_amount: number;
+  max_amount: number;
+  usage_per_cup: number;
+}
+
+interface PackagingMaterial {
+  id: string;
+  name: string;
+  current_amount: number;
+  max_amount: number;
+}
 
 const InventoryPage = () => {
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
   const [replenishItems, setReplenishItems] = useState<Record<string, number>>({});
 
-  const inventory = {
-    milk: { current: 15, max: 50, unit: "L", name: "牛奶", icon: Milk, usage: 0.2 },
-    beans: { current: 8, max: 20, unit: "kg", name: "咖啡豆", icon: Coffee, usage: 0.015 },
-  };
+  const { data: rawMaterials = [] } = useQuery<RawMaterial[]>({
+    queryKey: ["raw_materials", STORE_ID],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("raw_materials")
+        .select("*")
+        .eq("store_id", STORE_ID);
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
-  const packaging = {
-    hotCups: { current: 60, max: 300, name: "热杯" },
-    coldCups: { current: 80, max: 300, name: "冰杯" },
-    hotLids: { current: 50, max: 300, name: "热杯盖" },
-    coldLids: { current: 70, max: 300, name: "冰杯盖" },
-    paperBags: { current: 100, max: 200, name: "纸袋" },
-    sleeves: { current: 80, max: 300, name: "杯套" },
-    holders: { current: 40, max: 200, name: "杯托" },
-    straws: { current: 200, max: 500, name: "吸管" },
-    sealStickers: { current: 150, max: 400, name: "封口贴纸" },
-  };
+  const { data: packagingMaterials = [] } = useQuery<PackagingMaterial[]>({
+    queryKey: ["packaging_materials", STORE_ID],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("packaging_materials")
+        .select("*")
+        .eq("store_id", STORE_ID);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fallback data when DB is empty (not logged in / no data yet)
+  const fallbackRaw: RawMaterial[] = [
+    { id: "fb-milk", name: "牛奶", icon: "Milk", unit: "L", current_amount: 15, max_amount: 50, usage_per_cup: 0.2 },
+    { id: "fb-beans", name: "咖啡豆", icon: "Coffee", unit: "kg", current_amount: 8, max_amount: 20, usage_per_cup: 0.015 },
+  ];
+  const fallbackPkg: PackagingMaterial[] = [
+    { id: "fb-1", name: "热杯", current_amount: 60, max_amount: 300 },
+    { id: "fb-2", name: "冰杯", current_amount: 80, max_amount: 300 },
+    { id: "fb-3", name: "热杯盖", current_amount: 50, max_amount: 300 },
+    { id: "fb-4", name: "冰杯盖", current_amount: 70, max_amount: 300 },
+    { id: "fb-5", name: "纸袋", current_amount: 100, max_amount: 200 },
+    { id: "fb-6", name: "杯套", current_amount: 80, max_amount: 300 },
+    { id: "fb-7", name: "杯托", current_amount: 40, max_amount: 200 },
+    { id: "fb-8", name: "吸管", current_amount: 200, max_amount: 500 },
+    { id: "fb-9", name: "封口贴纸", current_amount: 150, max_amount: 400 },
+  ];
+
+  const inventory = rawMaterials.length > 0 ? rawMaterials : fallbackRaw;
+  const packaging = packagingMaterials.length > 0 ? packagingMaterials : fallbackPkg;
 
   const calculateAvailable = () => {
-    const milkLimit = Math.floor(inventory.milk.current / inventory.milk.usage);
-    const beansLimit = Math.floor(inventory.beans.current / inventory.beans.usage);
-    const cupsLimit = Math.min(packaging.hotCups.current, packaging.coldCups.current);
-    const lidsLimit = Math.min(packaging.hotLids.current, packaging.coldLids.current);
-    return Math.min(milkLimit, beansLimit, cupsLimit, lidsLimit);
+    // Calculate based on raw materials usage_per_cup
+    const rawLimits = inventory.map(m => Math.floor(m.current_amount / m.usage_per_cup));
+    // Cups and lids as packaging constraint
+    const cupsItem = packaging.filter(p => p.name.includes("杯") && !p.name.includes("盖") && !p.name.includes("套") && !p.name.includes("托"));
+    const lidsItem = packaging.filter(p => p.name.includes("盖"));
+    const cupsLimit = cupsItem.length > 0 ? Math.min(...cupsItem.map(c => c.current_amount)) : Infinity;
+    const lidsLimit = lidsItem.length > 0 ? Math.min(...lidsItem.map(l => l.current_amount)) : Infinity;
+    return Math.min(...rawLimits, cupsLimit, lidsLimit);
   };
 
   const availableProducts = calculateAvailable();
@@ -60,14 +111,13 @@ const InventoryPage = () => {
   };
 
   const allItems = [
-    ...Object.entries(inventory).map(([k, v]) => ({ key: k, ...v })),
-    ...Object.entries(packaging).map(([k, v]) => ({ key: k, ...v, unit: "个" })),
+    ...inventory.map(m => ({ key: m.id, name: m.name, unit: m.unit })),
+    ...packaging.map(m => ({ key: m.id, name: m.name, unit: "个" })),
   ];
 
   return (
     <div className="p-3 pb-20 space-y-2">
       {/* Available Count */}
-
       <Card className={`glass-card px-3 py-2 ${isLowStock ? "border-destructive" : "border-success"}`}>
         {isLowStock && (
           <div className="flex items-center gap-1 text-destructive">
@@ -119,11 +169,11 @@ const InventoryPage = () => {
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
           <div className="grid grid-cols-3 gap-1.5">
-            {Object.values(inventory).map((item) => {
-              const status = getStockStatus(item.current, item.max);
-              const percentage = (item.current / item.max) * 100;
+            {inventory.map((item) => {
+              const status = getStockStatus(item.current_amount, item.max_amount);
+              const percentage = (item.current_amount / item.max_amount) * 100;
               return (
-                <div key={item.name} className="p-1.5 rounded bg-secondary/30">
+                <div key={item.id} className="p-1.5 rounded bg-secondary/30">
                   <div className="flex items-center justify-between mb-0.5">
                     <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
                     <Badge
@@ -137,8 +187,8 @@ const InventoryPage = () => {
                     </Badge>
                   </div>
                   <div className="flex items-baseline gap-0.5">
-                    <span className="text-sm font-bold">{item.current}</span>
-                    <span className="text-[8px] text-muted-foreground">/{item.max} {item.unit}</span>
+                    <span className="text-sm font-bold">{item.current_amount}</span>
+                    <span className="text-[8px] text-muted-foreground">/{item.max_amount} {item.unit}</span>
                   </div>
                   <Progress
                     value={percentage}
@@ -157,11 +207,11 @@ const InventoryPage = () => {
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">包材</h3>
           <div className="grid grid-cols-3 gap-1.5">
-            {Object.values(packaging).map((item) => {
-              const status = getStockStatus(item.current, item.max);
-              const percentage = (item.current / item.max) * 100;
+            {packaging.map((item) => {
+              const status = getStockStatus(item.current_amount, item.max_amount);
+              const percentage = (item.current_amount / item.max_amount) * 100;
               return (
-                <div key={item.name} className="p-1.5 rounded bg-secondary/30">
+                <div key={item.id} className="p-1.5 rounded bg-secondary/30">
                   <div className="flex items-center justify-between mb-0.5">
                     <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
                     <Badge
@@ -175,8 +225,8 @@ const InventoryPage = () => {
                     </Badge>
                   </div>
                   <div className="flex items-baseline gap-0.5">
-                    <span className="text-sm font-bold">{item.current}</span>
-                    <span className="text-[8px] text-muted-foreground">/{item.max}</span>
+                    <span className="text-sm font-bold">{item.current_amount}</span>
+                    <span className="text-[8px] text-muted-foreground">/{item.max_amount}</span>
                   </div>
                   <Progress
                     value={percentage}
