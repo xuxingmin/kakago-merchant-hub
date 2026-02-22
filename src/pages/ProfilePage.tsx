@@ -9,7 +9,11 @@ import {
   Coffee,
   TrendingUp,
   FileCheck,
-  X,
+  FileText,
+  Package,
+  MessageCircle,
+  AlertTriangle,
+  Star,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -17,11 +21,32 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
+const taskCards = [
+  { id: 1, type: "invoice" as const, title: "开票申请", desc: "客户张先生申请开具¥256发票", tag: "开票" },
+  { id: 2, type: "inventory" as const, title: "库存预警", desc: "燕麦奶库存不足，剩余12杯用量", tag: "库存", urgent: true },
+  { id: 3, type: "interaction" as const, title: "互动提醒", desc: "2条客户评价待回复", tag: "互动" },
+  { id: 4, type: "inventory" as const, title: "库存预警", desc: "杯盖库存低于安全值", tag: "库存", urgent: true },
+];
+
+const taskTypeConfig = {
+  invoice: { icon: FileText, color: "bg-primary/20 text-primary" },
+  inventory: { icon: Package, color: "bg-destructive/20 text-destructive" },
+  interaction: { icon: MessageCircle, color: "bg-accent/60 text-accent-foreground" },
+};
+
+const recentReviews = [
+  { rating: 5, comment: "咖啡很香，配送快！", time: "10分钟前" },
+  { rating: 4, comment: "口味不错", time: "30分钟前" },
+  { rating: 3, comment: "这次有点凉了", time: "1小时前" },
+];
+
 const ProfilePage = () => {
   const [showStoreSheet, setShowStoreSheet] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [showFeedbackSheet, setShowFeedbackSheet] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [replyReviewIndex, setReplyReviewIndex] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState("");
 
   const userInfo = {
     storeName: "KAKAGO 中关村店",
@@ -75,7 +100,6 @@ const ProfilePage = () => {
 
       {/* Top Cards - Identity & Stats */}
       <div className="grid grid-cols-2 gap-2">
-        {/* Left - Store Identity */}
         <Card className="glass-card p-3">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -91,7 +115,6 @@ const ProfilePage = () => {
           </Badge>
         </Card>
 
-        {/* Right - Store Stats */}
         <Card className="glass-card p-3">
           <p className="text-xs text-muted-foreground mb-1">累计收益</p>
           <div className="flex items-baseline gap-1">
@@ -114,9 +137,67 @@ const ProfilePage = () => {
         </Card>
       </div>
 
+      {/* 任务卡 */}
+      <Card className="glass-card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-foreground">任务卡</h2>
+          <Badge className="bg-primary/20 text-primary text-xs">{taskCards.length} 项</Badge>
+        </div>
+        <div className="space-y-2">
+          {taskCards.map(task => {
+            const config = taskTypeConfig[task.type];
+            const Icon = config.icon;
+            return (
+              <div key={task.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${task.urgent ? "bg-destructive/10 border border-destructive/20" : "bg-secondary/30"}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${config.color}`}>
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-semibold text-foreground">{task.title}</span>
+                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-muted-foreground/30 text-muted-foreground">{task.tag}</Badge>
+                    {task.urgent && <AlertTriangle className="w-3 h-3 text-destructive" />}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
+                </div>
+                <Button variant="ghost" size="sm" className="text-[11px] h-7 px-3 text-primary shrink-0">去处理</Button>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* 客户评价 */}
+      <Card className="glass-card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-foreground">客户评价</h2>
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 text-primary fill-primary" />
+            <span className="text-sm font-bold text-foreground">4.8</span>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          {recentReviews.map((review, i) => (
+            <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl bg-secondary/20">
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="flex shrink-0">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className={`w-3 h-3 ${j < review.rating ? "text-primary fill-primary" : "text-muted"}`} />
+                  ))}
+                </div>
+                <span className="text-xs text-foreground truncate">{review.comment}</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 ml-2">
+                <span className="text-[10px] text-muted-foreground">{review.time}</span>
+                <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2 text-primary" onClick={() => setReplyReviewIndex(i)}>回复</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       {/* Menu Items */}
       <Card className="glass-card divide-y divide-border">
-        {/* Store Profile */}
         <button
           className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
           onClick={() => setShowStoreSheet(true)}
@@ -131,7 +212,6 @@ const ProfilePage = () => {
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
 
-        {/* Join KAKAGO */}
         <button
           className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
           onClick={() => setShowJoinDialog(true)}
@@ -146,7 +226,6 @@ const ProfilePage = () => {
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
 
-        {/* Feedback */}
         <button
           className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
           onClick={() => setShowFeedbackSheet(true)}
@@ -162,7 +241,6 @@ const ProfilePage = () => {
         </button>
       </Card>
 
-      {/* Version Info */}
       <p className="text-center text-xs text-muted-foreground pt-2">
         KAKAGO v1.0.0
       </p>
@@ -174,7 +252,6 @@ const ProfilePage = () => {
             <SheetTitle>门店资料</SheetTitle>
           </SheetHeader>
           <div className="space-y-4 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
-            {/* Text Fields */}
             <div className="space-y-3">
               {storeFields.map((field) => (
                 <div key={field.key} className="space-y-1">
@@ -187,8 +264,6 @@ const ProfilePage = () => {
                 </div>
               ))}
             </div>
-
-            {/* Upload Fields */}
             <div className="space-y-3 pt-2">
               <p className="text-xs text-muted-foreground font-medium">证照上传</p>
               <div className="grid grid-cols-2 gap-2">
@@ -204,7 +279,6 @@ const ProfilePage = () => {
                 ))}
               </div>
             </div>
-
             <Button className="w-full bg-primary mt-4">保存资料</Button>
           </div>
         </SheetContent>
@@ -216,7 +290,6 @@ const ProfilePage = () => {
           <DialogHeader>
             <DialogTitle className="text-center">加入 KAKAGO</DialogTitle>
           </DialogHeader>
-          
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground text-center">
               成为KAKAGO合作商户，享受以下权益：
@@ -229,7 +302,6 @@ const ProfilePage = () => {
                 </div>
               ))}
             </div>
-
             <div className="flex items-start gap-2 p-3 rounded bg-primary/10 border border-primary/30">
               <input
                 type="checkbox"
@@ -242,19 +314,13 @@ const ProfilePage = () => {
               </p>
             </div>
           </div>
-
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setShowJoinDialog(false)}>
-              取消
-            </Button>
-            <Button 
-              size="sm" 
-              className="bg-primary" 
+            <Button variant="outline" size="sm" onClick={() => setShowJoinDialog(false)}>取消</Button>
+            <Button
+              size="sm"
+              className="bg-primary"
               disabled={!agreedToTerms}
-              onClick={() => {
-                alert("申请已提交，我们将尽快与您联系！");
-                setShowJoinDialog(false);
-              }}
+              onClick={() => { alert("申请已提交，我们将尽快与您联系！"); setShowJoinDialog(false); }}
             >
               签署并加入
             </Button>
@@ -277,6 +343,36 @@ const ProfilePage = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* 回复评价 Dialog */}
+      <Dialog open={replyReviewIndex !== null} onOpenChange={(open) => { if (!open) { setReplyReviewIndex(null); setReplyText(""); } }}>
+        <DialogContent className="bg-background border-border max-w-[90vw] rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-sm">回复评价</DialogTitle>
+          </DialogHeader>
+          {replyReviewIndex !== null && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-secondary/20">
+                <div className="flex shrink-0">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className={`w-2.5 h-2.5 ${j < recentReviews[replyReviewIndex].rating ? "text-primary fill-primary" : "text-muted"}`} />
+                  ))}
+                </div>
+                <span className="text-xs text-foreground">{recentReviews[replyReviewIndex].comment}</span>
+              </div>
+              <Textarea
+                placeholder="输入回复内容..."
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+                className="min-h-[80px] text-sm bg-secondary/20 border-border"
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <Button size="sm" className="w-full" onClick={() => { setReplyReviewIndex(null); setReplyText(""); }}>提交</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
