@@ -16,6 +16,8 @@ import {
   Star,
   Shield,
   Zap,
+  BookOpen,
+  ClipboardList,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -48,6 +50,8 @@ const ProfilePage = () => {
   const [showInviteSheet, setShowInviteSheet] = useState(false);
   const [showTodoSheet, setShowTodoSheet] = useState(false);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
+  const [showGuideSheet, setShowGuideSheet] = useState(false);
+  const [showSopSheet, setShowSopSheet] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [replyReviewIndex, setReplyReviewIndex] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -210,6 +214,34 @@ const ProfilePage = () => {
 
         <button
           className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
+          onClick={() => setShowGuideSheet(true)}
+        >
+          <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
+            <BookOpen className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium">经营须知</p>
+            <p className="text-xs text-muted-foreground">门店运营规范与注意事项</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
+          onClick={() => setShowSopSheet(true)}
+        >
+          <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
+            <ClipboardList className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium">产品SOP</p>
+            <p className="text-xs text-muted-foreground">标准制作流程与品控规范</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
           onClick={() => setShowInviteSheet(true)}
         >
           <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -226,6 +258,65 @@ const ProfilePage = () => {
       <p className="text-center text-xs text-muted-foreground pt-2">
         KAKAGO v1.0.0
       </p>
+
+      {/* 经营须知 Sheet */}
+      <Sheet open={showGuideSheet} onOpenChange={setShowGuideSheet}>
+        <SheetContent side="bottom" className="bg-background border-t border-border h-[85vh]">
+          <SheetHeader className="pb-3">
+            <SheetTitle>经营须知</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-3 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
+            {[
+              { title: "营业时间规范", items: ["每日需在系统设定时间内保持上线状态", "如需临时休息，请提前在系统中设置暂停接单", "连续3天未上线将触发总部关注提醒"] },
+              { title: "订单处理要求", items: ["接单后需在5分钟内开始制作", "出杯后及时点击「制作完成」更新状态", "如遇缺料无法制作，立即联系客户协商换品或取消"] },
+              { title: "品质管控标准", items: ["严格按照产品SOP执行制作流程", "每日开店前完成设备校准与清洁", "原材料需按规范存储，过期物料严禁使用"] },
+              { title: "卫生与安全", items: ["操作区域每2小时清洁消毒一次", "员工需持有效健康证上岗", "食品安全许可证需在有效期内并张贴公示"] },
+              { title: "库存管理", items: ["每日盘点核心原材料库存", "库存低于安全线时及时通过智能补货下单", "收货时需核对品项与数量并检查保质期"] },
+            ].map((section, i) => (
+              <div key={i} className="rounded-xl bg-secondary/40 p-3 space-y-1.5">
+                <h4 className="text-sm font-bold text-foreground">{section.title}</h4>
+                {section.items.map((item, j) => (
+                  <div key={j} className="flex items-start gap-2">
+                    <span className="text-primary text-xs mt-0.5">-</span>
+                    <span className="text-xs text-muted-foreground leading-relaxed">{item}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 产品SOP Sheet */}
+      <Sheet open={showSopSheet} onOpenChange={setShowSopSheet}>
+        <SheetContent side="bottom" className="bg-background border-t border-border h-[85vh]">
+          <SheetHeader className="pb-3">
+            <SheetTitle>产品SOP</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-3 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
+            {[
+              { name: "经典美式", steps: ["研磨咖啡豆 18g（中细研磨）", "萃取浓缩 36ml / 25-30秒", "加入热水至 240ml（水温92-96度）", "轻轻搅拌均匀，装杯出品"] },
+              { name: "拿铁", steps: ["研磨咖啡豆 18g（中细研磨）", "萃取浓缩 36ml / 25-30秒", "打发牛奶至 60-65度，绵密微泡", "注入牛奶至 360ml，拉花出品"] },
+              { name: "冰美式", steps: ["研磨咖啡豆 18g（中细研磨）", "萃取浓缩 36ml / 25-30秒", "杯中加满冰块（约200g）", "注入冷水至 360ml，搅拌出品"] },
+              { name: "燕麦拿铁", steps: ["研磨咖啡豆 18g（中细研磨）", "萃取浓缩 36ml / 25-30秒", "打发燕麦奶至 60-65度", "注入燕麦奶至 360ml，拉花出品"] },
+              { name: "春季特调（花魁拼配）", steps: ["研磨花魁拼配豆 20g（中研磨）", "萃取浓缩 40ml / 28-32秒", "加入风味糖浆 10ml", "打发牛奶注入至 360ml，撒干花装饰"] },
+            ].map((product, i) => (
+              <div key={i} className="rounded-xl bg-secondary/40 p-3 space-y-1.5">
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                  <Coffee className="w-3.5 h-3.5 text-primary" />
+                  {product.name}
+                </h4>
+                {product.steps.map((step, j) => (
+                  <div key={j} className="flex items-start gap-2">
+                    <span className="text-[11px] font-bold text-primary w-4 shrink-0">{j + 1}.</span>
+                    <span className="text-xs text-muted-foreground leading-relaxed">{step}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Store Profile Sheet */}
       <Sheet open={showStoreSheet} onOpenChange={setShowStoreSheet}>
