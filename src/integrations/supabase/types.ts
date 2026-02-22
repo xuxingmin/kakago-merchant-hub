@@ -319,6 +319,41 @@ export type Database = {
           },
         ]
       }
+      product_bom: {
+        Row: {
+          created_at: string
+          id: string
+          material_name: string
+          material_type: string
+          product_id: string
+          quantity_per_cup: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          material_name: string
+          material_type: string
+          product_id: string
+          quantity_per_cup?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          material_name?: string
+          material_type?: string
+          product_id?: string
+          quantity_per_cup?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_bom_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_options: {
         Row: {
           id: string
