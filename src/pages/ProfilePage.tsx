@@ -44,6 +44,8 @@ const ProfilePage = () => {
   const [showStoreSheet, setShowStoreSheet] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [showFeedbackSheet, setShowFeedbackSheet] = useState(false);
+  const [showTodoSheet, setShowTodoSheet] = useState(false);
+  const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [replyReviewIndex, setReplyReviewIndex] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -137,67 +139,37 @@ const ProfilePage = () => {
         </Card>
       </div>
 
-      {/* 任务卡 */}
-      <Card className="glass-card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold text-foreground">任务卡</h2>
-          <Badge className="bg-primary/20 text-primary text-xs">{taskCards.length} 项</Badge>
-        </div>
-        <div className="space-y-2">
-          {taskCards.map(task => {
-            const config = taskTypeConfig[task.type];
-            const Icon = config.icon;
-            return (
-              <div key={task.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${task.urgent ? "bg-destructive/10 border border-destructive/20" : "bg-secondary/30"}`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${config.color}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-foreground">{task.title}</span>
-                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-muted-foreground/30 text-muted-foreground">{task.tag}</Badge>
-                    {task.urgent && <AlertTriangle className="w-3 h-3 text-destructive" />}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
-                </div>
-                <Button variant="ghost" size="sm" className="text-[11px] h-7 px-3 text-primary shrink-0">去处理</Button>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* 客户评价 */}
-      <Card className="glass-card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold text-foreground">客户评价</h2>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-primary fill-primary" />
-            <span className="text-sm font-bold text-foreground">4.8</span>
-          </div>
-        </div>
-        <div className="space-y-1.5">
-          {recentReviews.map((review, i) => (
-            <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl bg-secondary/20">
-              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="flex shrink-0">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className={`w-3 h-3 ${j < review.rating ? "text-primary fill-primary" : "text-muted"}`} />
-                  ))}
-                </div>
-                <span className="text-xs text-foreground truncate">{review.comment}</span>
-              </div>
-              <div className="flex items-center gap-2 shrink-0 ml-2">
-                <span className="text-[10px] text-muted-foreground">{review.time}</span>
-                <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2 text-primary" onClick={() => setReplyReviewIndex(i)}>回复</Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
       {/* Menu Items */}
       <Card className="glass-card divide-y divide-border">
+        <button
+          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
+          onClick={() => setShowTodoSheet(true)}
+        >
+          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center relative">
+            <FileText className="w-4 h-4 text-primary" />
+            {taskCards.some(t => t.urgent) && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium">待办清单</p>
+            <p className="text-xs text-muted-foreground">{taskCards.length} 项待处理</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
+          onClick={() => setShowReviewSheet(true)}
+        >
+          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
+            <Star className="w-4 h-4 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium">客户评价</p>
+            <p className="text-xs text-muted-foreground">评分 4.8 · {recentReviews.length} 条新评价</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </button>
+
         <button
           className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
           onClick={() => setShowStoreSheet(true)}
@@ -340,6 +312,70 @@ const ProfilePage = () => {
               <Textarea placeholder="请描述您遇到的问题或建议..." className="min-h-[120px]" />
             </div>
             <Button className="w-full bg-primary">提交反馈</Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 待办清单 Sheet */}
+      <Sheet open={showTodoSheet} onOpenChange={setShowTodoSheet}>
+        <SheetContent side="bottom" className="bg-background border-t border-border h-[85vh]">
+          <SheetHeader className="pb-3">
+            <SheetTitle>待办清单</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
+            {taskCards.map(task => {
+              const config = taskTypeConfig[task.type];
+              const Icon = config.icon;
+              return (
+                <div key={task.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${task.urgent ? "bg-destructive/10 border border-destructive/20" : "bg-secondary/30"}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${config.color}`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-foreground">{task.title}</span>
+                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-muted-foreground/30 text-muted-foreground">{task.tag}</Badge>
+                      {task.urgent && <AlertTriangle className="w-3 h-3 text-destructive" />}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-[11px] h-7 px-3 text-primary shrink-0">去处理</Button>
+                </div>
+              );
+            })}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* 客户评价 Sheet */}
+      <Sheet open={showReviewSheet} onOpenChange={setShowReviewSheet}>
+        <SheetContent side="bottom" className="bg-background border-t border-border h-[85vh]">
+          <SheetHeader className="pb-3">
+            <SheetTitle className="flex items-center gap-2">
+              客户评价
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-primary fill-primary" />
+                <span className="text-sm font-bold text-foreground">4.8</span>
+              </div>
+            </SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
+            {recentReviews.map((review, i) => (
+              <div key={i} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-secondary/20">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex shrink-0">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className={`w-3 h-3 ${j < review.rating ? "text-primary fill-primary" : "text-muted"}`} />
+                    ))}
+                  </div>
+                  <span className="text-xs text-foreground truncate">{review.comment}</span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 ml-2">
+                  <span className="text-[10px] text-muted-foreground">{review.time}</span>
+                  <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2 text-primary" onClick={() => setReplyReviewIndex(i)}>回复</Button>
+                </div>
+              </div>
+            ))}
           </div>
         </SheetContent>
       </Sheet>
