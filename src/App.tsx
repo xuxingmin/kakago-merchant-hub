@@ -8,6 +8,7 @@ import WorkPage from "./pages/WorkPage";
 import DataPage from "./pages/DataPage";
 import InventoryPage from "./pages/InventoryPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettlementPage from "./pages/SettlementPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/data" element={<DataPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settlement" element={<SettlementPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
