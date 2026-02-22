@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Package, Phone, Plus, Minus } from "lucide-react";
+import { AlertTriangle, Package, Phone, Plus, Minus, Milk, Coffee } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
 import { useQuery } from "@tanstack/react-query";
@@ -39,7 +39,43 @@ interface GridItem {
   current: number;
   max: number;
   unit?: string;
+  icon?: string;
 }
+
+const iconMap: Record<string, React.ReactNode> = {
+  Milk: <Milk className="w-4 h-4 text-muted-foreground" />,
+  Coffee: <Coffee className="w-4 h-4 text-muted-foreground" />,
+};
+
+const RawMaterialRow = ({ item }: { item: GridItem }) => {
+  const status = getStockStatus(item.current, item.max);
+  const pct = (item.current / item.max) * 100;
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          {item.icon && iconMap[item.icon] ? iconMap[item.icon] : <Package className="w-4 h-4 text-muted-foreground" />}
+          <span className="text-sm font-medium">{item.name}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-lg font-bold">{item.current}</span>
+          <span className="text-xs text-muted-foreground">/ {item.max} {item.unit || ""}</span>
+          <Badge
+            variant="outline"
+            className={`text-[10px] px-1.5 py-0 h-4 ${badgeClass(status.color)}`}
+          >
+            {status.text}
+          </Badge>
+        </div>
+      </div>
+      <Progress
+        value={pct}
+        className={`h-1.5 ${progressClass(status.color)}`}
+      />
+    </div>
+  );
+};
 
 const InventoryGridCard = ({ item }: { item: GridItem }) => {
   const status = getStockStatus(item.current, item.max);
@@ -116,6 +152,7 @@ const InventoryPage = () => {
     current: Number(r.current_amount),
     max: Number(r.max_amount),
     unit: r.unit,
+    icon: r.icon,
   }));
 
   const packItems: GridItem[] = packagingMaterials.map((p) => ({
@@ -200,12 +237,12 @@ const InventoryPage = () => {
           库存明细
         </h2>
 
-        {/* Raw Materials - Grid format matching packaging */}
+        {/* Raw Materials - List row format */}
         <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="space-y-3">
             {rawItems.map((item) => (
-              <InventoryGridCard key={item.id} item={item} />
+              <RawMaterialRow key={item.id} item={item} />
             ))}
           </div>
         </Card>
