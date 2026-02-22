@@ -3,67 +3,61 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Mock data
-const pendingSettlements = [
-  { id: "p1", period: "第 5 期", dateRange: "02/16 - 02/22", amount: 32968 },
-  { id: "p2", period: "第 6 期", dateRange: "02/23 - 03/01", amount: 28450 },
+const processingSettlements = [
+  {
+    id: "p1",
+    period: "第 5 期",
+    dateRange: "02/16 周一 - 02/18 周三",
+    amount: 12450,
+    expectedDate: "预计 02/20 周五到账",
+    daily: [
+      { date: "02/18 周三", cups: 102, amount: 4100 },
+      { date: "02/17 周二", cups: 138, amount: 5100 },
+      { date: "02/16 周一", cups: 85, amount: 3250 },
+    ],
+  },
 ];
 
-const settledHistory = [
-  { id: "s1", period: "第 4 期", dateRange: "02/09 - 02/15", amount: 15200 },
-  { id: "s2", period: "第 3 期", dateRange: "02/02 - 02/08", amount: 18960 },
-  { id: "s3", period: "第 2 期", dateRange: "01/26 - 02/01", amount: 12300 },
+const paidSettlements = [
+  {
+    id: "s1",
+    period: "第 4 期",
+    dateRange: "02/09 - 02/15",
+    amount: 32968,
+    daily: [
+      { date: "02/15 周六", cups: 156, amount: 6340 },
+      { date: "02/14 周五", cups: 162, amount: 6800 },
+      { date: "02/13 周四", cups: 148, amount: 5600 },
+      { date: "02/12 周三", cups: 160, amount: 6100 },
+      { date: "02/11 周二", cups: 138, amount: 5100 },
+      { date: "02/10 周一", cups: 105, amount: 3028 },
+    ],
+  },
+  {
+    id: "s2",
+    period: "第 3 期",
+    dateRange: "02/02 - 02/08",
+    amount: 28450,
+    daily: [
+      { date: "02/08 周六", cups: 140, amount: 5800 },
+      { date: "02/07 周五", cups: 155, amount: 6200 },
+      { date: "02/06 周四", cups: 130, amount: 5000 },
+      { date: "02/05 周三", cups: 145, amount: 5600 },
+      { date: "02/04 周二", cups: 120, amount: 4350 },
+      { date: "02/03 周一", cups: 95, amount: 1500 },
+    ],
+  },
 ];
 
-const dailyBreakdown = [
-  { date: "02/22 周六", cups: 156, amount: 6340 },
-  { date: "02/21 周五", cups: 162, amount: 6800 },
-  { date: "02/20 周四", cups: 148, amount: 5600 },
-  { date: "02/19 周三", cups: 160, amount: 6100 },
-  { date: "02/18 周二", cups: 138, amount: 5100 },
-  { date: "02/17 周一", cups: 105, amount: 3028 },
-];
-
-type Tab = "pending" | "settled";
+type Tab = "processing" | "paid";
+type Settlement = (typeof processingSettlements)[0] | (typeof paidSettlements)[0];
 
 const SettlementPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>("pending");
-  const [showReconciliation, setShowReconciliation] = useState(false);
-  const [showBankModal, setShowBankModal] = useState(false);
-  const [selectedSettlement, setSelectedSettlement] = useState<typeof pendingSettlements[0] | null>(null);
-  const [reviewingIds, setReviewingIds] = useState<Set<string>>(new Set());
-
-  // Bank form state
-  const [bankForm, setBankForm] = useState({
-    name: "",
-    bank: "",
-    account: "",
-    phone: "",
-  });
-
-  const handleReconcile = (settlement: typeof pendingSettlements[0]) => {
-    setSelectedSettlement(settlement);
-    setShowReconciliation(true);
-  };
-
-  const handleConfirmWithdraw = () => {
-    setShowBankModal(true);
-  };
-
-  const handleSubmitApplication = () => {
-    if (selectedSettlement) {
-      setReviewingIds((prev) => new Set(prev).add(selectedSettlement.id));
-    }
-    setShowBankModal(false);
-    setShowReconciliation(false);
-    setBankForm({ name: "", bank: "", account: "", phone: "" });
-  };
+  const [activeTab, setActiveTab] = useState<Tab>("processing");
+  const [selectedSettlement, setSelectedSettlement] = useState<Settlement | null>(null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,8 +75,8 @@ const SettlementPage = () => {
       <div className="px-4 pt-3">
         <div className="flex bg-secondary/50 rounded-lg p-1">
           {([
-            { key: "pending" as Tab, label: "待结算" },
-            { key: "settled" as Tab, label: "已结算" },
+            { key: "processing" as Tab, label: "结算中" },
+            { key: "paid" as Tab, label: "已打款" },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -102,57 +96,47 @@ const SettlementPage = () => {
       {/* Tab Content */}
       <div className="px-4 py-3 pb-24 space-y-3">
         <AnimatePresence mode="wait">
-          {activeTab === "pending" ? (
+          {activeTab === "processing" ? (
             <motion.div
-              key="pending"
+              key="processing"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.2 }}
               className="space-y-3"
             >
-              {pendingSettlements.map((s) => {
-                const isReviewing = reviewingIds.has(s.id);
-                return (
-                  <Card key={s.id} className="bg-secondary/30 border-border/30 p-4 rounded-xl">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="text-sm font-bold text-foreground">{s.period}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{s.dateRange}</p>
-                      </div>
-                    </div>
-                    <p className="text-2xl font-black text-foreground tracking-tight mb-3">
-                      ¥{s.amount.toLocaleString()}
-                    </p>
-                    {isReviewing ? (
-                      <Button
-                        disabled
-                        className="w-full h-10 text-xs font-medium bg-secondary/50 text-muted-foreground cursor-not-allowed"
-                      >
-                        [ 复核打款中... ]
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full h-10 text-xs font-bold bg-primary hover:bg-primary/90"
-                        onClick={() => handleReconcile(s)}
-                      >
-                        [ 去对账 ]
-                      </Button>
-                    )}
-                  </Card>
-                );
-              })}
+              {processingSettlements.map((s) => (
+                <Card key={s.id} className="bg-secondary/30 border-border/30 p-4 rounded-xl">
+                  <div className="mb-3">
+                    <p className="text-sm font-bold text-foreground">{s.period}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{s.dateRange}</p>
+                  </div>
+                  <p className="text-2xl font-black text-foreground tracking-tight mb-2">
+                    ¥{s.amount.toLocaleString()}
+                  </p>
+                  <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-md bg-primary/15 text-primary mb-3">
+                    {s.expectedDate}
+                  </span>
+                  <Button
+                    variant="outline"
+                    className="w-full h-10 text-xs font-bold border-primary/50 text-primary hover:bg-primary/10"
+                    onClick={() => setSelectedSettlement(s)}
+                  >
+                    [ 查看明细 ]
+                  </Button>
+                </Card>
+              ))}
             </motion.div>
           ) : (
             <motion.div
-              key="settled"
+              key="paid"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
               className="space-y-3"
             >
-              {settledHistory.map((s) => (
+              {paidSettlements.map((s) => (
                 <Card key={s.id} className="bg-secondary/30 border-border/30 p-4 rounded-xl">
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -163,9 +147,16 @@ const SettlementPage = () => {
                       [ 已打款 ]
                     </span>
                   </div>
-                  <p className="text-2xl font-black text-foreground tracking-tight">
+                  <p className="text-2xl font-black text-foreground tracking-tight mb-3">
                     ¥{s.amount.toLocaleString()}
                   </p>
+                  <Button
+                    variant="outline"
+                    className="w-full h-10 text-xs font-medium border-border/50 text-muted-foreground hover:bg-secondary/50"
+                    onClick={() => setSelectedSettlement(s)}
+                  >
+                    [ 查看明细 ]
+                  </Button>
                 </Card>
               ))}
             </motion.div>
@@ -173,16 +164,16 @@ const SettlementPage = () => {
         </AnimatePresence>
       </div>
 
-      {/* Reconciliation Drawer */}
+      {/* Details Drawer */}
       <AnimatePresence>
-        {showReconciliation && selectedSettlement && (
+        {selectedSettlement && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 bg-black/60"
-              onClick={() => setShowReconciliation(false)}
+              onClick={() => setSelectedSettlement(null)}
             />
             <motion.div
               initial={{ y: "100%" }}
@@ -192,11 +183,11 @@ const SettlementPage = () => {
               className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl border-t border-border flex flex-col"
               style={{ maxHeight: "85vh" }}
             >
-              {/* Header */}
+              {/* Drawer Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-                <h2 className="text-sm font-bold text-foreground">本期对账单</h2>
+                <h2 className="text-sm font-bold text-foreground">结算账单明细</h2>
                 <button
-                  onClick={() => setShowReconciliation(false)}
+                  onClick={() => setSelectedSettlement(null)}
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-5 h-5" />
@@ -217,7 +208,7 @@ const SettlementPage = () => {
               {/* Daily breakdown */}
               <div className="flex-1 overflow-y-auto px-4 space-y-1.5 pb-2">
                 <p className="text-xs font-semibold text-muted-foreground mb-2">每日明细</p>
-                {dailyBreakdown.map((d, i) => (
+                {selectedSettlement.daily.map((d, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -10 }}
@@ -234,75 +225,28 @@ const SettlementPage = () => {
                 ))}
               </div>
 
-              {/* Sticky bottom */}
+              {/* Explanation Box */}
+              <div className="px-4 py-3">
+                <div className="rounded-xl bg-secondary/40 px-3 py-3">
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
+                    【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。每周四系统自动核算上一周期（周一至周日，或入驻日起的实际营业天数）的账单，并于周五（T+1）自动打款至您的绑定账户。您仅需核对账目，无需手动提现。
+                  </p>
+                </div>
+              </div>
+
+              {/* Close Button */}
               <div className="px-4 py-3 border-t border-border/50">
                 <Button
-                  className="w-full h-12 text-sm font-bold bg-primary hover:bg-primary/90"
-                  onClick={handleConfirmWithdraw}
+                  className="w-full h-12 text-sm font-bold bg-secondary hover:bg-secondary/80 text-muted-foreground"
+                  onClick={() => setSelectedSettlement(null)}
                 >
-                  [ 确认对账并提现 ]
+                  [ 关闭 ]
                 </Button>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-
-      {/* Bank Card Modal */}
-      <Dialog open={showBankModal} onOpenChange={setShowBankModal}>
-        <DialogContent className="bg-background border-border max-w-[90vw] rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-sm font-bold">绑定收款账户</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <p className="text-[11px] text-destructive">
-              * 首次提现需绑定结算银行卡，请确保信息准确。
-            </p>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">收款人姓名</Label>
-              <Input
-                placeholder="请输入收款人姓名"
-                value={bankForm.name}
-                onChange={(e) => setBankForm((f) => ({ ...f, name: e.target.value }))}
-                className="h-10 bg-secondary/30 border-border/50 text-sm"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">开户行</Label>
-              <Input
-                placeholder="请输入开户行名称"
-                value={bankForm.bank}
-                onChange={(e) => setBankForm((f) => ({ ...f, bank: e.target.value }))}
-                className="h-10 bg-secondary/30 border-border/50 text-sm"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">银行账号</Label>
-              <Input
-                placeholder="请输入银行卡号"
-                value={bankForm.account}
-                onChange={(e) => setBankForm((f) => ({ ...f, account: e.target.value }))}
-                className="h-10 bg-secondary/30 border-border/50 text-sm"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">预留手机号</Label>
-              <Input
-                placeholder="请输入预留手机号"
-                value={bankForm.phone}
-                onChange={(e) => setBankForm((f) => ({ ...f, phone: e.target.value }))}
-                className="h-10 bg-secondary/30 border-border/50 text-sm"
-              />
-            </div>
-          </div>
-          <Button
-            className="w-full h-11 text-sm font-bold bg-primary hover:bg-primary/90 mt-2"
-            onClick={handleSubmitApplication}
-          >
-            [ 提交提现申请 ]
-          </Button>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
