@@ -11,21 +11,31 @@ import {
 } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 
-// --- Mock Data (profit only) ---
+// --- Generate date-based mock data ---
+const today = new Date();
+
 const dailyChartData = [0, 4, 8, 12, 16, 20, 24].map((h) => ({
   label: `${h}时`,
   profit: Math.round(800 + Math.random() * 1200),
 }));
 
-const weeklyChartData = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"].map((d) => ({
-  label: d,
-  profit: Math.round(3500 + Math.random() * 4000),
-}));
+const weeklyChartData = Array.from({ length: 7 }, (_, i) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() - 6 + i);
+  return {
+    label: `${d.getMonth() + 1}/${d.getDate()}`,
+    profit: Math.round(3500 + Math.random() * 4000),
+  };
+});
 
-const monthlyChartData = Array.from({ length: 31 }, (_, i) => ({
-  label: `${i + 1}`,
-  profit: Math.round(3000 + Math.random() * 5000),
-}));
+const monthlyChartData = Array.from({ length: 30 }, (_, i) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() - 29 + i);
+  return {
+    label: `${d.getMonth() + 1}/${d.getDate()}`,
+    profit: Math.round(3000 + Math.random() * 5000),
+  };
+});
 
 // --- Other mock data (unchanged) ---
 const profitOrders = [
@@ -92,6 +102,9 @@ const DataPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-base font-bold text-foreground">经营概览</h1>
+        <span className="text-xs text-muted-foreground">
+          {today.getFullYear()}/{String(today.getMonth() + 1).padStart(2, "0")}/{String(today.getDate()).padStart(2, "0")} {["周日","周一","周二","周三","周四","周五","周六"][today.getDay()]}
+        </span>
       </div>
 
       {/* 四宫格核心数据 */}
