@@ -229,7 +229,7 @@ const SettlementPage = () => {
               <div className="px-4 py-3">
                 <div className="rounded-xl bg-secondary/40 px-3 py-3">
                   <p className="text-[11px] leading-relaxed text-muted-foreground">
-                    【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。每周四系统自动核算上一周期（周一至周日，或入驻日起的实际营业天数）的账单，并于周五（T+1）自动打款至您的绑定账户。您仅需核对账目，无需手动提现。
+                    【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。系统将自动核算本账期（上周五 00:00 至本周四 24:00，含首周非完整天数）的有效订单利润，并于每周五自动打款至您的绑定账户。资金全自动流转，您仅需核对明细，无需手动申请提现。
                   </p>
                 </div>
               </div>
