@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import MerchantBanner from "@/components/MerchantBanner";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ChevronRight, X, CheckCircle2 } from "lucide-react";
@@ -189,6 +190,7 @@ const PromoBanner = () => {
 
 const DataPage = () => {
   const navigate = useNavigate();
+  const [isOnline, setIsOnline] = useState(true);
   const [showProfitDetail, setShowProfitDetail] = useState(false);
   const [showSettlement, setShowSettlement] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -227,6 +229,9 @@ const DataPage = () => {
           {today.getFullYear()}/{String(today.getMonth() + 1).padStart(2, "0")}/{String(today.getDate()).padStart(2, "0")} {["周日","周一","周二","周三","周四","周五","周六"][today.getDay()]}
         </span>
       </div>
+
+      {/* Merchant Banner */}
+      <MerchantBanner isOnline={isOnline} onOnlineChange={setIsOnline} />
 
       {/* Promo Banner Carousel */}
       <PromoBanner />
