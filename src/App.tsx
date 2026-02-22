@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BottomNav from "./components/BottomNav";
+import MerchantBanner from "./components/MerchantBanner";
 import WorkPage from "./pages/WorkPage";
 import DataPage from "./pages/DataPage";
 import InventoryPage from "./pages/InventoryPage";
@@ -20,6 +21,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <div className="min-h-screen bg-background">
+          <MerchantBanner />
           <Routes>
             <Route path="/" element={<WorkPage />} />
             <Route path="/data" element={<DataPage />} />

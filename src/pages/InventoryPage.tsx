@@ -1,5 +1,4 @@
 import { useState } from "react";
-import MerchantBanner from "@/components/MerchantBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
 
 const InventoryPage = () => {
-  const [isOnline, setIsOnline] = useState(true);
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
   const [replenishItems, setReplenishItems] = useState<Record<string, number>>({});
 
@@ -68,8 +66,7 @@ const InventoryPage = () => {
 
   return (
     <div className="p-3 pb-20 space-y-2">
-      {/* Header - Store Info & Available Count */}
-      <MerchantBanner isOnline={isOnline} onOnlineChange={setIsOnline} />
+      {/* Available Count */}
 
       <Card className={`glass-card px-3 py-2 ${isLowStock ? "border-destructive" : "border-success"}`}>
         {isLowStock && (

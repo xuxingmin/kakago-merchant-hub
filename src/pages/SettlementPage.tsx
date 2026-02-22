@@ -81,16 +81,14 @@ const SettlementPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50">
-        <div className="flex items-center px-4 py-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="mr-3 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-base font-bold text-foreground">结算管理</h1>
-        </div>
+      <div className="flex items-center px-4 py-3 border-b border-border/50">
+        <button
+          onClick={() => navigate(-1)}
+          className="mr-3 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h1 className="text-base font-bold text-foreground">结算管理</h1>
       </div>
 
       {/* All Bills */}

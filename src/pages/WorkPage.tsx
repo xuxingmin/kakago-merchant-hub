@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import MerchantBanner from "@/components/MerchantBanner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +34,6 @@ const mockOrders: Order[] = [
 ];
 
 const WorkPage = () => {
-  const [isOnline, setIsOnline] = useState(true);
   const [orders, setOrders] = useState<Order[]>(mockOrders);
   const [activeTab, setActiveTab] = useState<"order" | "delivery">("order");
 
@@ -151,11 +149,6 @@ const WorkPage = () => {
 
   return (
     <div className="pb-24">
-      {/* Compact Banner */}
-      <div className="mx-4 mt-4">
-        <MerchantBanner isOnline={isOnline} onOnlineChange={setIsOnline} />
-      </div>
-
       {/* Tab Switcher */}
       <div className="flex mx-4 mt-3">
         <button
