@@ -9,7 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 
 // --- Generate date-based mock data ---
 const today = new Date();
@@ -250,7 +250,7 @@ const DataPage = () => {
       {/* 利润趋势 Chart */}
       <Card className="glass-card p-3">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xs font-bold text-foreground">利润趋势</h2>
+          <h2 className="text-xs font-bold text-foreground">经营看板</h2>
           <div className="flex bg-secondary/50 rounded-md p-0.5">
             {([
               { key: "daily", label: "日" },
@@ -272,11 +272,17 @@ const DataPage = () => {
           </div>
         </div>
         <ChartContainer config={chartConfig} className="h-[150px] w-full">
-          <LineChart
+          <AreaChart
             key={chartPeriod}
             data={chartData}
             margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
           >
+            <defs>
+              <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#a855f7" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#a855f7" stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.2} />
             <XAxis
               dataKey="label"
@@ -296,17 +302,18 @@ const DataPage = () => {
               width={35}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Line
+            <Area
               type="monotone"
               dataKey="profit"
               name="利润"
               stroke="#a855f7"
               strokeWidth={2}
+              fill="url(#profitGradient)"
               dot={{ r: chartPeriod === "monthly" ? 1.5 : 3, fill: "#a855f7" }}
               activeDot={{ r: 4 }}
               animationDuration={500}
             />
-          </LineChart>
+          </AreaChart>
         </ChartContainer>
       </Card>
 
@@ -315,13 +322,13 @@ const DataPage = () => {
         <Card className="glass-card px-4 py-4">
           <p className="text-xs text-muted-foreground mb-1">累计利润</p>
           <p className="text-xl font-black text-foreground">¥125,555</p>
-          <p className="text-[10px] text-muted-foreground mt-1">今日出单: 156单</p>
+          <p className="text-[10px] text-muted-foreground mt-1">累计出单: 6,420单</p>
         </Card>
         <Card
           className="bg-primary px-4 py-4 rounded-xl cursor-pointer active:scale-[0.97] transition-transform"
           onClick={() => setShowSettlement(true)}
         >
-          <p className="text-xs text-primary-foreground/70 mb-1">账单结算</p>
+          <p className="text-xs text-primary-foreground/70 mb-1">待结算</p>
           <p className="text-lg font-bold text-primary-foreground mt-2 flex items-center gap-1">
             去结算 <ChevronRight className="w-4 h-4" />
           </p>
