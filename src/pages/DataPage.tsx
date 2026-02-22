@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { ChevronRight } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -69,6 +69,111 @@ const chartConfig = {
   profit: { label: "利润", color: "#a855f7" },
 };
 
+// --- Promo Banner Data ---
+const promoBanners = [
+  {
+    id: 1,
+    title: "KAKAGO",
+    subtitle: "不贵精品，即刻上瘾！",
+    coupons: [
+      { label: "限时", value: "¥3" },
+      { label: "拿铁", value: "¥2" },
+      { label: "美式", value: "¥2" },
+    ],
+    cta: "GO! 自动用券",
+  },
+  {
+    id: 2,
+    title: "KAKAGO",
+    subtitle: "每日特惠，咖啡不停！",
+    coupons: [
+      { label: "新品", value: "¥5" },
+      { label: "满减", value: "¥3" },
+    ],
+    cta: "立即领取",
+  },
+  {
+    id: 3,
+    title: "KAKAGO",
+    subtitle: "邀请好友，双倍积分！",
+    coupons: [
+      { label: "积分", value: "x2" },
+      { label: "返现", value: "¥8" },
+      { label: "礼包", value: "¥10" },
+    ],
+    cta: "去邀请 >",
+  },
+];
+
+const PromoBanner = () => {
+  const [current, setCurrent] = useState(0);
+
+  const next = useCallback(() => {
+    setCurrent((c) => (c + 1) % promoBanners.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(next, 4000);
+    return () => clearInterval(timer);
+  }, [next]);
+
+  const banner = promoBanners[current];
+
+  return (
+    <div className="relative overflow-hidden rounded-xl bg-secondary/40 border border-border/30 px-4 py-3">
+      <div
+        key={banner.id}
+        className="flex items-center justify-between gap-3 animate-fade-in"
+      >
+        {/* Left: branding */}
+        <div className="shrink-0 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-bold text-foreground">KAKAGO</span>
+            <span className="text-primary text-xs">✦</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-0.5 whitespace-nowrap">{banner.subtitle}</p>
+        </div>
+
+        {/* Center: coupon flags */}
+        <div className="flex items-end gap-1.5">
+          {banner.coupons.map((c, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center"
+              style={{ marginTop: i % 2 === 0 ? 0 : 4 }}
+            >
+              <div className="bg-primary rounded-t-md px-1.5 pt-0.5 pb-0">
+                <span className="text-[8px] text-primary-foreground leading-none">{c.label}</span>
+              </div>
+              <div className="bg-primary rounded-b-md px-2 py-1 clip-flag">
+                <span className="text-sm font-black text-primary-foreground leading-none">{c.value}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right: CTA */}
+        <button className="shrink-0 text-[10px] text-primary font-medium whitespace-nowrap">
+          {banner.cta}
+        </button>
+      </div>
+
+      {/* Dots */}
+      <div className="flex items-center justify-center gap-1 mt-2">
+        {promoBanners.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`w-1 h-1 rounded-full transition-all ${
+              i === current ? "bg-primary w-3" : "bg-muted-foreground/40"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const DataPage = () => {
   const [showProfitDetail, setShowProfitDetail] = useState(false);
   const [showSettlement, setShowSettlement] = useState(false);
@@ -106,6 +211,9 @@ const DataPage = () => {
           {today.getFullYear()}/{String(today.getMonth() + 1).padStart(2, "0")}/{String(today.getDate()).padStart(2, "0")} {["周日","周一","周二","周三","周四","周五","周六"][today.getDay()]}
         </span>
       </div>
+
+      {/* Promo Banner Carousel */}
+      <PromoBanner />
 
       {/* 四宫格核心数据 */}
       <div className="grid grid-cols-2 gap-3">
