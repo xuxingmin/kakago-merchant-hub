@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, X, CheckCircle2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ChartContainer,
   ChartTooltip,
@@ -61,6 +63,16 @@ const settlements = [
   { period: "第3期", amount: 2950, status: "settlable" as SettlementStatus },
   { period: "第4期", amount: 1580, status: "disputed" as SettlementStatus },
   { period: "第5期", amount: 3400, status: "settlable" as SettlementStatus },
+];
+
+// Settlement daily breakdown mock
+const settlementDailyDetails = [
+  { date: "02/22 周六", cups: 156, amount: 6340 },
+  { date: "02/21 周五", cups: 162, amount: 6800 },
+  { date: "02/20 周四", cups: 148, amount: 5600 },
+  { date: "02/19 周三", cups: 160, amount: 6100 },
+  { date: "02/18 周二", cups: 138, amount: 5100 },
+  { date: "02/17 周一", cups: 105, amount: 3028 },
 ];
 
 type TimePeriod = "daily" | "weekly" | "monthly";
@@ -177,6 +189,8 @@ const PromoBanner = () => {
 const DataPage = () => {
   const [showProfitDetail, setShowProfitDetail] = useState(false);
   const [showSettlement, setShowSettlement] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [settlementStatus, setSettlementStatus] = useState<"pending" | "reviewing">("pending");
   const [settlementFilter, setSettlementFilter] = useState<SettlementStatus | "all">("all");
   const [chartPeriod, setChartPeriod] = useState<TimePeriod>("daily");
 
@@ -352,36 +366,131 @@ const DataPage = () => {
         </SheetContent>
       </Sheet>
 
-      {/* 账单结算 Sheet */}
-      <Sheet open={showSettlement} onOpenChange={setShowSettlement}>
-        <SheetContent side="bottom" className="bg-background border-t border-border h-[70vh]">
-          <SheetHeader className="pb-2">
-            <SheetTitle className="text-sm">账单结算</SheetTitle>
-          </SheetHeader>
-          <div className="flex gap-1 mb-3 bg-secondary/40 rounded-md p-0.5">
-            {(["all", "settlable", "settled", "disputed"] as const).map(key => (
-              <button
-                key={key}
-                onClick={() => setSettlementFilter(key)}
-                className={`flex-1 px-2 py-1 text-xs rounded transition-colors ${settlementFilter === key ? "bg-primary text-primary-foreground font-medium" : "text-muted-foreground"}`}
-              >
-                {key === "all" ? "全部" : settlementStatusLabels[key]}
-              </button>
-            ))}
-          </div>
-          <div className="space-y-1.5 overflow-y-auto max-h-[calc(70vh-110px)]">
-            {filteredSettlements.map((s, i) => (
-              <div key={i} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-secondary/30">
-                <div>
-                  <p className="text-sm font-bold text-foreground">{s.period}</p>
-                  <p className="text-xs text-muted-foreground">¥{s.amount.toLocaleString()}</p>
-                </div>
-                <Badge className={`text-[10px] ${statusBadgeClass(s.status)}`}>{settlementStatusLabels[s.status]}</Badge>
+      {/* 本期结算详情 Drawer */}
+      <AnimatePresence>
+        {showSettlement && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/60"
+              onClick={() => setShowSettlement(false)}
+            />
+            {/* Drawer */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl border-t border-border flex flex-col"
+              style={{ maxHeight: "85vh" }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+                <h2 className="text-sm font-bold text-foreground">本期结算详情</h2>
+                <button onClick={() => setShowSettlement(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            ))}
+
+              {/* Hero Amount */}
+              <div className="px-4 py-5 text-center">
+                <p className="text-xs text-muted-foreground mb-1">本期结算利润</p>
+                <p className="text-4xl font-black text-foreground tracking-tight">¥32,968</p>
+                <p className="text-[11px] text-muted-foreground mt-1">结算周期: 02/16 - 02/22</p>
+              </div>
+
+              {/* Daily breakdown */}
+              <div className="flex-1 overflow-y-auto px-4 space-y-1.5 pb-2">
+                <p className="text-xs font-semibold text-muted-foreground mb-2">每日明细</p>
+                {settlementDailyDetails.map((d, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-secondary/30"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{d.date}</p>
+                      <p className="text-[11px] text-muted-foreground">共 {d.cups} 杯</p>
+                    </div>
+                    <span className="text-sm font-bold text-primary">+¥{d.amount.toLocaleString()}</span>
+                  </motion.div>
+                ))}
+
+                {/* Explanation box */}
+                <div className="mt-3 p-3 rounded-xl bg-secondary/40 border border-border/30">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    【KAKAGO 结算规则】商户自正式营业日起，系统默认采用 T+7 周期结算模式。账期内的有效订单利润，将在满7个自然日后转入待结算账户。请仔细核对明细，无误后点击下方按钮完成对账。
+                  </p>
+                </div>
+              </div>
+
+              {/* Sticky bottom */}
+              <div className="px-4 py-3 border-t border-border/50">
+                {settlementStatus === "pending" ? (
+                  <Button
+                    className="w-full h-12 text-sm font-bold bg-primary hover:bg-primary/90"
+                    onClick={() => setShowConfirmModal(true)}
+                  >
+                    去对账结算
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="w-full h-12 text-sm font-medium bg-secondary/50 text-muted-foreground cursor-not-allowed"
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                    账单已确认，平台复核打款中...
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* 对账确认弹窗 */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="bg-background border-border max-w-[90vw] rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-bold">确认结算账单</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-secondary/30">
+              <span className="text-xs text-muted-foreground">结算金额</span>
+              <span className="text-lg font-black text-primary">¥32,968</span>
+            </div>
+            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-secondary/30">
+              <span className="text-xs text-muted-foreground">打款账户</span>
+              <span className="text-xs font-medium text-foreground">KAKAGO 绑定账户 (尾号 8888)</span>
+            </div>
           </div>
-        </SheetContent>
-      </Sheet>
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              取消
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1 bg-primary"
+              onClick={() => {
+                setSettlementStatus("reviewing");
+                setShowConfirmModal(false);
+              }}
+            >
+              确认无误，申请打款
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
