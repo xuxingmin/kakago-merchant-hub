@@ -218,32 +218,32 @@ const DataPage = () => {
       {/* 四宫格核心数据 */}
       <div className="grid grid-cols-2 gap-3">
         <Card
-          className="glass-card px-4 py-4 cursor-pointer active:scale-[0.97] transition-transform"
+          className="bg-primary px-4 py-4 rounded-xl cursor-pointer active:scale-[0.97] transition-transform"
           onClick={() => setShowProfitDetail(true)}
         >
-          <p className="text-xs text-muted-foreground mb-1.5">今日利润</p>
-          <p className="text-2xl font-black text-foreground tracking-tight">¥6,340</p>
-          <p className="text-[11px] text-primary mt-2 flex items-center gap-0.5">
+          <p className="text-xs text-primary-foreground/70 mb-1.5">今日利润</p>
+          <p className="text-2xl font-black text-primary-foreground tracking-tight">¥6,340</p>
+          <p className="text-[11px] text-primary-foreground/80 mt-2 flex items-center gap-0.5">
             查看详情 <ChevronRight className="w-3 h-3" />
           </p>
         </Card>
         <Card
-          className="glass-card px-4 py-4 cursor-pointer active:scale-[0.97] transition-transform"
+          className="bg-primary px-4 py-4 rounded-xl cursor-pointer active:scale-[0.97] transition-transform"
           onClick={() => setShowSettlement(true)}
         >
-          <p className="text-xs text-muted-foreground mb-1.5">结算周期利润</p>
-          <p className="text-2xl font-black text-primary tracking-tight">¥32,968</p>
-          <p className="text-[11px] text-primary mt-2 flex items-center gap-0.5">
+          <p className="text-xs text-primary-foreground/70 mb-1.5">结算周期利润</p>
+          <p className="text-2xl font-black text-primary-foreground tracking-tight">¥32,968</p>
+          <p className="text-[11px] text-primary-foreground/80 mt-2 flex items-center gap-0.5">
             去对账结算 <ChevronRight className="w-3 h-3" />
           </p>
         </Card>
-        <Card className="glass-card px-4 py-4">
-          <p className="text-xs text-muted-foreground mb-1.5">本月利润</p>
-          <p className="text-2xl font-black text-foreground tracking-tight">¥{monthlyProfit.toLocaleString()}</p>
+        <Card className="bg-primary px-4 py-4 rounded-xl">
+          <p className="text-xs text-primary-foreground/70 mb-1.5">本月利润</p>
+          <p className="text-2xl font-black text-primary-foreground tracking-tight">¥{monthlyProfit.toLocaleString()}</p>
         </Card>
-        <Card className="glass-card px-4 py-4">
-          <p className="text-xs text-muted-foreground mb-1.5">今日出杯</p>
-          <p className="text-2xl font-black text-foreground tracking-tight">156</p>
+        <Card className="bg-primary px-4 py-4 rounded-xl">
+          <p className="text-xs text-primary-foreground/70 mb-1.5">今日出杯</p>
+          <p className="text-2xl font-black text-primary-foreground tracking-tight">156</p>
         </Card>
       </div>
 
@@ -319,10 +319,10 @@ const DataPage = () => {
 
       {/* Bottom 2-card row */}
       <div className="grid grid-cols-2 gap-3">
-        <Card className="glass-card px-4 py-4">
-          <p className="text-xs text-muted-foreground mb-1">累计利润</p>
-          <p className="text-xl font-black text-foreground">¥125,555</p>
-          <p className="text-[10px] text-muted-foreground mt-1">累计出单: 6,420单</p>
+        <Card className="bg-primary px-4 py-4 rounded-xl">
+          <p className="text-xs text-primary-foreground/70 mb-1">累计利润</p>
+          <p className="text-xl font-black text-primary-foreground">¥125,555</p>
+          <p className="text-[10px] text-primary-foreground/60 mt-1">累计出单: 6,420单</p>
         </Card>
         <Card
           className="bg-primary px-4 py-4 rounded-xl cursor-pointer active:scale-[0.97] transition-transform"
