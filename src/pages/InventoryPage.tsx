@@ -1,4 +1,5 @@
 import { useState } from "react";
+import MerchantBanner from "@/components/MerchantBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import SmartSupplyChainWidget from "@/components/SmartSupplyChainWidget";
 
 const InventoryPage = () => {
+  const [isOnline, setIsOnline] = useState(true);
   const [showReplenishDialog, setShowReplenishDialog] = useState(false);
   const [replenishItems, setReplenishItems] = useState<Record<string, number>>({});
 
@@ -67,32 +69,26 @@ const InventoryPage = () => {
   return (
     <div className="p-3 pb-20 space-y-2">
       {/* Header - Store Info & Available Count */}
-      <div className="grid grid-cols-2 gap-2">
-        <Card className="glass-card px-3 py-2">
-          <span className="text-sm font-bold text-muted-foreground">KAKAGO</span>
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground">中关村店</span>
-            <span className="text-xs text-muted-foreground">KKG-0012</span>
-          </div>
-        </Card>
+      <MerchantBanner isOnline={isOnline} onOnlineChange={setIsOnline} />
 
-        <Card className={`glass-card px-3 py-2 ${isLowStock ? "border-destructive" : "border-success"}`}>
-          {isLowStock && (
-            <div className="flex items-center gap-1 text-destructive">
-              <AlertTriangle className="w-3 h-3" />
-              <span className="text-xs font-bold">库存预警</span>
-            </div>
-          )}
-          <p className="text-xs text-muted-foreground">当前可售</p>
-          <div className="flex items-baseline">
-            <span className={`text-2xl font-bold ${isLowStock ? "text-destructive" : "text-success"}`}>
-              {availableProducts}
-            </span>
-            <span className="text-xs text-muted-foreground ml-1">杯</span>
+      <Card className={`glass-card px-3 py-2 ${isLowStock ? "border-destructive" : "border-success"}`}>
+        {isLowStock && (
+          <div className="flex items-center gap-1 text-destructive">
+            <AlertTriangle className="w-3 h-3" />
+            <span className="text-xs font-bold">库存预警</span>
           </div>
+        )}
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">当前可售</p>
           <p className="text-[10px] text-muted-foreground/60">基于库存原材料最低组合计算</p>
-        </Card>
-      </div>
+        </div>
+        <div className="flex items-baseline">
+          <span className={`text-2xl font-bold ${isLowStock ? "text-destructive" : "text-success"}`}>
+            {availableProducts}
+          </span>
+          <span className="text-xs text-muted-foreground ml-1">杯</span>
+        </div>
+      </Card>
 
       {/* Supply Chain & Emergency Replenish */}
       <div className="grid grid-cols-2 gap-2">

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { Switch } from "@/components/ui/switch";
+import MerchantBanner from "@/components/MerchantBanner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ChefHat, Clock, History, Power } from "lucide-react";
+import { Truck, ChefHat, Clock, History } from "lucide-react";
 import SwipeableOrderCard from "@/components/SwipeableOrderCard";
 import {
   Dialog,
@@ -152,34 +152,9 @@ const WorkPage = () => {
   return (
     <div className="pb-24">
       {/* Compact Banner */}
-      <Card className="glass-card px-4 py-2 mx-4 mt-4">
-        <div className="flex items-center">
-          <span className="text-base font-bold text-muted-foreground mr-4">KAKAGO</span>
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground">中关村店</span>
-            <span className="text-xs text-muted-foreground">KKG-0012</span>
-          </div>
-          <div className="ml-auto">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Switch checked={isOnline} onCheckedChange={setIsOnline} className="scale-75 data-[state=checked]:bg-primary" />
-              {isOnline ? (
-                <div className="flex items-center gap-1.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                  </span>
-                  <span className="text-xs text-foreground">上线接单中</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 animate-bounce">
-                  <Power className="w-5 h-5 text-foreground animate-ping" />
-                  <span className="text-sm font-black text-foreground animate-pulse">上线</span>
-                </div>
-              )}
-            </label>
-          </div>
-        </div>
-      </Card>
+      <div className="mx-4 mt-4">
+        <MerchantBanner isOnline={isOnline} onOnlineChange={setIsOnline} />
+      </div>
 
       {/* Tab Switcher */}
       <div className="flex mx-4 mt-3">
