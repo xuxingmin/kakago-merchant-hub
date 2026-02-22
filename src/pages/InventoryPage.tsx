@@ -116,36 +116,33 @@ const InventoryPage = () => {
         </h2>
 
         {/* Raw Materials */}
-        <div>
+        <Card className="glass-card p-3">
           <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
-          <div className="divide-y divide-border">
+          <div className="grid grid-cols-3 gap-1.5">
             {Object.values(inventory).map((item) => {
               const status = getStockStatus(item.current, item.max);
               const percentage = (item.current / item.max) * 100;
               return (
-                <div key={item.name} className="py-2 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <item.icon className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{item.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-base font-bold">{item.current}</span>
-                      <span className="text-muted-foreground text-xs">/ {item.max} {item.unit}</span>
-                      <Badge
-                        variant={status.color === "success" ? "default" : status.color === "warning" ? "secondary" : "destructive"}
-                        className={`text-[10px] px-1.5 py-0 ${
-                          status.color === "success" ? "bg-success" :
-                          status.color === "warning" ? "bg-warning text-warning-foreground" : ""
-                        }`}
-                      >
-                        {status.text}
-                      </Badge>
-                    </div>
+                <div key={item.name} className="p-1.5 rounded bg-secondary/30">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[8px] px-1 py-0 h-3 ${
+                        status.color === "destructive" ? "border-destructive text-destructive" :
+                        status.color === "warning" ? "border-warning text-warning" : "border-success text-success"
+                      }`}
+                    >
+                      {status.text}
+                    </Badge>
+                  </div>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-sm font-bold">{item.current}</span>
+                    <span className="text-[8px] text-muted-foreground">/{item.max} {item.unit}</span>
                   </div>
                   <Progress
                     value={percentage}
-                    className={`h-1.5 ${
+                    className={`h-1 mt-0.5 ${
                       status.color === "destructive" ? "[&>div]:bg-destructive" :
                       status.color === "warning" ? "[&>div]:bg-warning" : "[&>div]:bg-success"
                     }`}
@@ -154,7 +151,7 @@ const InventoryPage = () => {
               );
             })}
           </div>
-        </div>
+        </Card>
 
         {/* Packaging Materials */}
         <Card className="glass-card p-3">
