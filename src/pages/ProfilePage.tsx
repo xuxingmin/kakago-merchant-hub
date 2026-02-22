@@ -14,6 +14,8 @@ import {
   MessageCircle,
   AlertTriangle,
   Star,
+  Shield,
+  Zap,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -78,11 +80,32 @@ const ProfilePage = () => {
   ];
 
   const joinBenefits = [
-    "专属供应链支持，原料成本降低30%",
-    "KAKAGO品牌授权使用",
-    "数字化运营系统全套接入",
-    "每周定时补货，无需囤货压力",
-    "平台流量扶持与订单分成",
+    {
+      icon: Shield,
+      title: "独立咖啡守护",
+      desc: "抵抗工业化连锁的吞噬，用分布式的力量，捍卫属于独立咖啡馆的生存空间。",
+      accent: true,
+    },
+    {
+      icon: Store,
+      title: "门店绝对独立",
+      desc: "保持原有的价格体系与菜单独立，拒绝平台强制打折。零平台裹挟，无经营负担。",
+    },
+    {
+      icon: Zap,
+      title: "闲置产能变现",
+      desc: "告别低谷期打苍蝇。精准填补非高峰期产能，为你带来持续、稳定的额外收入。",
+    },
+    {
+      icon: TrendingUp,
+      title: "精准用户引流",
+      desc: "拒绝一次性羊毛党。为你精准输送真正懂咖啡的高质量客群，沉淀高频复购的死忠粉。",
+    },
+    {
+      icon: Coffee,
+      title: "AI 智能托管",
+      desc: "统一部署品控与包材。无需操心叫货与营销设置。无入驻门槛，你只管专注萃取出杯。",
+    },
   ];
 
   return (
@@ -176,10 +199,10 @@ const ProfilePage = () => {
           onClick={() => setShowJoinDialog(true)}
         >
           <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
-            <FileCheck className="w-4 h-4 text-primary" />
+            <Coffee className="w-4 h-4 text-primary" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium">加入KAKAGO</p>
+            <p className="text-sm font-medium">开启合作</p>
             <p className="text-xs text-muted-foreground">加入我们，一起成长</p>
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -243,49 +266,83 @@ const ProfilePage = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Join KAKAGO Dialog */}
-      <Dialog open={showJoinDialog} onOpenChange={setShowJoinDialog}>
-        <DialogContent className="bg-background border-border max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-center">加入 KAKAGO</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground text-center">
-              成为KAKAGO合作商户，享受以下权益：
-            </p>
-            <div className="space-y-2">
-              {joinBenefits.map((benefit, index) => (
-                <div key={index} className="flex items-start gap-2 p-2 rounded bg-secondary/30">
-                  <span className="text-primary text-sm">✓</span>
-                  <span className="text-sm text-foreground">{benefit}</span>
-                </div>
-              ))}
+      {/* Join KAKAGO Sheet */}
+      <Sheet open={showJoinDialog} onOpenChange={setShowJoinDialog}>
+        <SheetContent side="bottom" className="bg-background border-t border-border h-[90vh]">
+          <div className="overflow-y-auto max-h-[calc(90vh-20px)] pb-6">
+            {/* Hero */}
+            <div className="relative bg-gradient-to-b from-primary/20 via-background to-background pt-5 pb-2 px-4 text-center -mx-6 -mt-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-1.5">
+                <Coffee className="w-5 h-5 text-primary" />
+              </div>
+              <h2 className="text-[17px] font-bold text-foreground mb-0.5">
+                接入 KAKAGO 咖啡网络
+              </h2>
+              <p className="text-xs text-muted-foreground leading-snug max-w-[300px] mx-auto">
+                让闲置产能变现，成为全城精品咖啡基础设施。
+              </p>
+              <div className="flex justify-center gap-2 mt-2.5 flex-wrap">
+                {["0 入驻门槛", "稳定收入增量", "保持门店独立"].map((tag, i) => (
+                  <span key={i} className="text-[10px] font-medium text-primary bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="flex items-start gap-2 p-3 rounded bg-primary/10 border border-primary/30">
-              <input
-                type="checkbox"
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-0.5"
-              />
-              <p className="text-xs text-muted-foreground">
-                我已阅读并同意《KAKAGO合作商户协议》和《数据保护条款》
+
+            {/* Benefits */}
+            <div className="space-y-2 mt-4">
+              {joinBenefits.map((b, i) => {
+                const Icon = b.icon;
+                return (
+                  <div
+                    key={i}
+                    className={`rounded-xl px-4 py-3.5 border transition-all ${
+                      b.accent
+                        ? "bg-primary/10 border-primary/30"
+                        : "bg-secondary/50 border-transparent"
+                    }`}
+                    style={b.accent ? { boxShadow: '0 0 20px hsl(271 81% 56% / 0.15)' } : undefined}
+                  >
+                    <h3 className="text-sm font-bold text-foreground mb-1 tracking-tight flex items-center gap-1.5">
+                      <Icon className="w-4 h-4 text-primary" />
+                      {b.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed pl-5.5">{b.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* CTA */}
+            <div className="mt-4 space-y-2">
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/10 border border-primary/30">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-0.5 accent-primary"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  我已阅读并同意《KAKAGO合作商户协议》和《数据保护条款》
+                </p>
+              </div>
+              <Button
+                className="w-full bg-primary"
+                disabled={!agreedToTerms}
+                onClick={() => { alert("申请已提交，我们将尽快与您联系！"); setShowJoinDialog(false); }}
+              >
+                <Coffee className="w-4 h-4 mr-1" />
+                立即申请接入网络
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+              <p className="text-center text-[9px] text-muted-foreground/50">
+                提交申请后，24小时内将有工作人员与您联系
               </p>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setShowJoinDialog(false)}>取消</Button>
-            <Button
-              size="sm"
-              className="bg-primary"
-              disabled={!agreedToTerms}
-              onClick={() => { alert("申请已提交，我们将尽快与您联系！"); setShowJoinDialog(false); }}
-            >
-              签署并加入
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* 邀请伙伴 Sheet */}
       <Sheet open={showInviteSheet} onOpenChange={setShowInviteSheet}>
