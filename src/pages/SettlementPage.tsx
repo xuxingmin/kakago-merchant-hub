@@ -74,14 +74,9 @@ const mockBills: Bill[] = [
   },
 ];
 
-type Tab = "processing" | "paid";
-
 const SettlementPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>("processing");
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-
-  const filteredBills = mockBills.filter((b) => b.status === activeTab);
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,48 +93,18 @@ const SettlementPage = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4 pt-3">
-        <div className="flex bg-secondary/50 rounded-lg p-1">
-          {([
-            { key: "processing" as Tab, label: "结算中" },
-            { key: "paid" as Tab, label: "已打款" },
-          ]).map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                activeTab === tab.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Bill Cards */}
+      {/* All Bills */}
       <div className="px-4 py-3 pb-24 space-y-3">
-        <AnimatePresence mode="wait">
+        {mockBills.map((bill, i) => (
           <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, x: activeTab === "processing" ? -20 : 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: activeTab === "processing" ? 20 : -20 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-3"
+            key={bill.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06 }}
           >
-            {filteredBills.map((bill) => (
-              <BillCard
-                key={bill.id}
-                bill={bill}
-                onViewDetails={() => setSelectedBill(bill)}
-              />
-            ))}
+            <BillCard bill={bill} onViewDetails={() => setSelectedBill(bill)} />
           </motion.div>
-        </AnimatePresence>
+        ))}
       </div>
 
       {/* Details Drawer */}
@@ -167,15 +132,24 @@ const BillCard = ({
 
   return (
     <div className="bg-secondary/30 border border-border/30 p-4 rounded-xl">
-      {/* Top Row */}
-      <div className="mb-1">
-        <p className="text-xs text-muted-foreground">{bill.periodName}</p>
-        <p className="text-sm font-medium text-foreground mt-0.5">
-          {bill.dateRange}
-        </p>
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <p className="text-xs text-muted-foreground">{bill.periodName}</p>
+          <p className="text-sm font-medium text-foreground mt-0.5">
+            {bill.dateRange}
+          </p>
+        </div>
+        <span
+          className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${
+            isProcessing
+              ? "bg-primary/15 text-primary"
+              : "bg-green-500/15 text-green-400"
+          }`}
+        >
+          {isProcessing ? "[ 结算中 ]" : "[ 已结算 ]"}
+        </span>
       </div>
 
-      {/* Amount */}
       <p
         className={`text-2xl font-black tracking-tight my-3 ${
           isProcessing ? "text-primary" : "text-foreground"
@@ -184,11 +158,10 @@ const BillCard = ({
         ¥{bill.amount}
       </p>
 
-      {/* Bottom Row */}
       <div className="flex items-center justify-between">
         <span
           className={`text-[11px] font-medium ${
-            isProcessing ? "text-primary" : "text-green-400"
+            isProcessing ? "text-primary/70" : "text-green-400/70"
           }`}
         >
           {bill.statusText}
@@ -196,11 +169,7 @@ const BillCard = ({
         <Button
           variant="outline"
           size="sm"
-          className={`h-8 text-xs font-bold ${
-            isProcessing
-              ? "border-primary/50 text-primary hover:bg-primary/10"
-              : "border-border/50 text-muted-foreground hover:bg-secondary/50"
-          }`}
+          className="h-8 text-xs font-bold border-border/50 text-muted-foreground hover:bg-secondary/50"
           onClick={onViewDetails}
         >
           [ 查看明细 ]
@@ -217,100 +186,80 @@ const DetailsDrawer = ({
 }: {
   bill: Bill;
   onClose: () => void;
-}) => {
-  return (
-    <>
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/60"
-        onClick={onClose}
-      />
+}) => (
+  <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/60"
+      onClick={onClose}
+    />
+    <motion.div
+      initial={{ y: "100%" }}
+      animate={{ y: 0 }}
+      exit={{ y: "100%" }}
+      transition={{ type: "spring", damping: 28, stiffness: 300 }}
+      className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl border-t border-border flex flex-col"
+      style={{ maxHeight: "85vh" }}
+    >
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 shrink-0">
+        <h2 className="text-sm font-bold text-foreground">结算账单明细</h2>
+        <button
+          onClick={onClose}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
 
-      {/* Drawer Panel */}
-      <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl border-t border-border flex flex-col"
-        style={{ maxHeight: "85vh" }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 shrink-0">
-          <h2 className="text-sm font-bold text-foreground">结算账单明细</h2>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+      <div className="px-4 py-5 text-center shrink-0">
+        <p className="text-xs text-muted-foreground mb-1">本期结算利润</p>
+        <p className="text-4xl font-black text-foreground tracking-tight">
+          ¥{bill.amount}
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-1.5">
+          结算周期: {bill.dateRange}
+        </p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 pb-2">
+        <p className="text-xs font-semibold text-muted-foreground mb-2">每日明细</p>
+        {bill.details.map((d, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.04 }}
+            className="flex items-center justify-between px-3 py-3 border-b border-border/20 last:border-b-0"
           >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">{d.date}</p>
+              <p className="text-[11px] text-muted-foreground">共 {d.cups} 杯</p>
+            </div>
+            <span className="text-sm font-bold text-primary">{d.revenue}</span>
+          </motion.div>
+        ))}
 
-        {/* Hero Amount */}
-        <div className="px-4 py-5 text-center shrink-0">
-          <p className="text-xs text-muted-foreground mb-1">本期结算利润</p>
-          <p className="text-4xl font-black text-foreground tracking-tight">
-            ¥{bill.amount}
+        <div className="rounded-xl bg-secondary/40 px-3 py-3 mt-3">
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。系统将自动核算本账期（上周五
+            00:00 至本周四
+            24:00，含首周非完整天数）的有效订单利润，并于每周五自动打款至您的绑定账户。资金全自动流转，您仅需核对明细，无需手动申请提现。
           </p>
-          <p className="text-[11px] text-muted-foreground mt-1.5">
-            结算周期: {bill.dateRange}
-          </p>
         </div>
+      </div>
 
-        {/* Daily Breakdown */}
-        <div className="flex-1 overflow-y-auto px-4 pb-2">
-          <p className="text-xs font-semibold text-muted-foreground mb-2">
-            每日明细
-          </p>
-          <div className="space-y-0">
-            {bill.details.map((d, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.04 }}
-                className="flex items-center justify-between px-3 py-3 border-b border-border/20 last:border-b-0"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {d.date}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    共 {d.cups} 杯
-                  </p>
-                </div>
-                <span className="text-sm font-bold text-primary">
-                  {d.revenue}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Rule Explanation Box */}
-          <div className="rounded-xl bg-secondary/40 px-3 py-3 mt-3">
-            <p className="text-[11px] leading-relaxed text-muted-foreground">
-              【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。系统将自动核算本账期（上周五
-              00:00 至本周四
-              24:00，含首周非完整天数）的有效订单利润，并于每周五自动打款至您的绑定账户。资金全自动流转，您仅需核对明细，无需手动申请提现。
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Close Button */}
-        <div className="px-4 py-3 border-t border-border/50 shrink-0">
-          <Button
-            className="w-full h-12 text-sm font-bold bg-secondary hover:bg-secondary/80 text-muted-foreground"
-            onClick={onClose}
-          >
-            [ 关闭 ]
-          </Button>
-        </div>
-      </motion.div>
-    </>
-  );
-};
+      <div className="px-4 py-3 border-t border-border/50 shrink-0">
+        <Button
+          className="w-full h-12 text-sm font-bold bg-secondary hover:bg-secondary/80 text-muted-foreground"
+          onClick={onClose}
+        >
+          [ 关闭 ]
+        </Button>
+      </div>
+    </motion.div>
+  </>
+);
 
 export default SettlementPage;
