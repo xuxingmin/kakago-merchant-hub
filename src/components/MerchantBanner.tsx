@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Power, Radio, X } from "lucide-react";
+import { Power, Megaphone, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const announcements = [
@@ -9,24 +9,42 @@ const announcements = [
     tag: "[系统通知]",
     title: "财务自动结算链路已升级",
     date: "2026-02-22",
-    content:
-      "为了提升商户资金周转效率，本周起 KAKAGO 已全面升级为全自动周结算模式。每周五系统将自动打款至您的绑定账户，无需手动操作提现。请前往「结算管理」查看账单明细。",
+    content: "为了提升商户资金周转效率，本周起 KAKAGO 已全面升级为全自动周结算模式。每周五系统将自动打款至您的绑定账户，无需手动操作提现。请前往「结算管理」查看账单明细。",
   },
   {
     id: 2,
     tag: "[运营战报]",
     title: "合肥蜀山测试店周日出杯量突破300杯",
     date: "2026-02-21",
-    content:
-      "热烈祝贺合肥蜀山测试店！通过精准的社区运营和发券策略，单日去重出杯量成功突破 300 杯。相关运营 SOP 已同步至商户学习中心，欢迎各位店长参考复用。",
+    content: "热烈祝贺合肥蜀山测试店！通过精准的社区运营和发券策略，单日去重出杯量成功突破 300 杯。相关运营 SOP 已同步至商户学习中心，欢迎各位店长参考复用。",
   },
   {
     id: 3,
     tag: "[物料上新]",
     title: "3月春季特调拼配豆已上线",
     date: "2026-02-20",
-    content:
-      "研发部最新推出的春季特调拼配咖啡豆（花魁拼配）现已加入订货清单。请各门店及时前往「智能补货」模块进行采购，预计到货周期为 3-5 天。",
+    content: "研发部最新推出的春季特调拼配咖啡豆（花魁拼配）现已加入订货清单。请各门店及时前往「智能补货」模块进行采购，预计到货周期为 3-5 天。",
+  },
+  {
+    id: 4,
+    tag: "[培训通知]",
+    title: "本周六新品制作培训直播",
+    date: "2026-02-19",
+    content: "总部将于本周六下午2点进行春季新品制作培训线上直播，请各门店咖啡师准时参加，直播链接将在开播前1小时推送。",
+  },
+  {
+    id: 5,
+    tag: "[平台公告]",
+    title: "3月起配送费补贴政策调整",
+    date: "2026-02-18",
+    content: "自3月1日起，配送费补贴将由平台统一承担，商户无需再分摊配送成本。具体细则请查阅最新版商户合作协议。",
+  },
+  {
+    id: 6,
+    tag: "[运营战报]",
+    title: "全国门店总出杯量突破50万杯",
+    date: "2026-02-17",
+    content: "截至本周，KAKAGO 全国合作门店累计出杯量已突破 50 万杯，感谢每一位合作伙伴的努力与坚持！",
   },
 ];
 
@@ -40,17 +58,7 @@ interface Announcement {
 
 const MerchantBanner = () => {
   const [isOnline, setIsOnline] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedNews, setSelectedNews] = useState<Announcement | null>(null);
-
-  const nextAnnouncement = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % announcements.length);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(nextAnnouncement, 3500);
-    return () => clearInterval(timer);
-  }, [nextAnnouncement]);
 
   return (
     <>
@@ -89,32 +97,26 @@ const MerchantBanner = () => {
           </div>
         </div>
 
-        {/* Announcement ticker */}
-        <div className="mx-3 mb-2 flex items-center gap-2 rounded-lg bg-secondary/60 border-l-2 border-primary px-2.5 py-1.5">
-          <Radio className="w-3.5 h-3.5 text-primary shrink-0" />
-          <span className="text-[10px] font-semibold text-foreground shrink-0 whitespace-nowrap">KAKAGO 总部</span>
-          <div className="w-px h-3 bg-border/50 shrink-0" />
-          <div
-            className="flex-1 overflow-hidden h-4 relative cursor-pointer"
-            onClick={() => setSelectedNews(announcements[currentIndex])}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={announcements[currentIndex].id}
-                initial={{ y: 14, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -14, opacity: 0 }}
-                transition={{ duration: 0.35, ease: "easeInOut" }}
-                className="absolute inset-0 flex items-center gap-1 truncate"
+        {/* Announcement ticker - expanded */}
+        <div className="mx-3 mb-2 rounded-xl bg-secondary/60 border-l-3 border-primary overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
+            <Megaphone className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-xs font-bold text-primary">广播</span>
+          </div>
+          {/* List */}
+          <div className="px-3 pb-2.5 space-y-0.5">
+            {announcements.map((item) => (
+              <button
+                key={item.id}
+                className="w-full flex items-center gap-2 py-1.5 px-1 rounded-md hover:bg-muted/40 transition-colors text-left cursor-pointer"
+                onClick={() => setSelectedNews(item)}
               >
-                <span className="text-[10px] font-medium text-primary shrink-0">
-                  {announcements[currentIndex].tag}
-                </span>
-                <span className="text-[10px] text-foreground truncate">
-                  {announcements[currentIndex].title}
-                </span>
-              </motion.div>
-            </AnimatePresence>
+                <span className="text-xs font-semibold text-primary shrink-0">{item.tag}</span>
+                <span className="text-xs text-foreground truncate">{item.title}</span>
+                <span className="text-[10px] text-muted-foreground shrink-0 ml-auto">{item.date.slice(5)}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
