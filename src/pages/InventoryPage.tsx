@@ -116,14 +116,14 @@ const InventoryPage = () => {
         </h2>
 
         {/* Raw Materials */}
-        <Card className="glass-card p-3">
+        <div>
           <h3 className="text-xs text-muted-foreground mb-2">原材料</h3>
-          <div className="space-y-2">
+          <div className="divide-y divide-border">
             {Object.values(inventory).map((item) => {
               const status = getStockStatus(item.current, item.max);
               const percentage = (item.current / item.max) * 100;
               return (
-                <div key={item.name} className="space-y-1">
+                <div key={item.name} className="py-2 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       <item.icon className="w-4 h-4 text-muted-foreground" />
@@ -154,7 +154,7 @@ const InventoryPage = () => {
               );
             })}
           </div>
-        </Card>
+        </div>
 
         {/* Packaging Materials */}
         <Card className="glass-card p-3">
