@@ -426,7 +426,7 @@ const DataPage = () => {
                 {/* Explanation box */}
                 <div className="mt-3 p-3 rounded-xl bg-secondary/40 border border-border/30">
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    【KAKAGO 结算规则】商户自正式营业日起，系统默认采用 T+7 周期结算模式。账期内的有效订单利润，将在满7个自然日后转入待结算账户。请仔细核对明细，无误后进入「经营 -&gt; 待结算」卡片进行对账提现。
+                    【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。系统将自动核算本账期（上周五 00:00 至本周四 24:00，含首周非完整天数）的有效订单利润，并于每周五自动打款至您的绑定账户。资金全自动流转，您仅需核对明细，无需手动申请提现。
                   </p>
                 </div>
               </div>
