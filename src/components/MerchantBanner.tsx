@@ -40,19 +40,19 @@ interface Announcement {
 
 const VISIBLE_COUNT = 3;
 
-const MerchantBanner = () => {
+const MerchantBanner = ({ showBroadcast = false }: { showBroadcast?: boolean }) => {
   const [isOnline, setIsOnline] = useState(true);
   const [selectedNews, setSelectedNews] = useState<Announcement | null>(null);
   const [startIndex, setStartIndex] = useState(0);
 
   // Rotate visible window every 3s when more than VISIBLE_COUNT items
   useEffect(() => {
-    if (announcements.length <= VISIBLE_COUNT) return;
+    if (!showBroadcast || announcements.length <= VISIBLE_COUNT) return;
     const timer = setInterval(() => {
       setStartIndex((prev) => (prev + 1) % announcements.length);
     }, 3000);
     return () => clearInterval(timer);
-  }, []);
+  }, [showBroadcast]);
 
   return (
     <>
@@ -91,39 +91,41 @@ const MerchantBanner = () => {
           </div>
         </div>
 
-        {/* Announcement list - shows 3, scrolls through all */}
-        <div className="mx-3 mb-2 rounded-xl bg-secondary/60 border-l-3 border-primary overflow-hidden">
-          <div className="flex items-center gap-2 px-3 pt-2 pb-1">
-            <Megaphone className="w-4 h-4 text-primary shrink-0" />
-            <span className="text-xs font-bold text-primary">广播</span>
-            {announcements.length > VISIBLE_COUNT && (
-              <span className="text-[10px] text-muted-foreground ml-auto">{announcements.length} 条</span>
-            )}
+        {/* Announcement list - only on profile */}
+        {showBroadcast && (
+          <div className="mx-3 mb-2 rounded-xl bg-secondary/60 border-l-3 border-primary overflow-hidden">
+            <div className="flex items-center gap-2 px-3 pt-2 pb-1">
+              <Megaphone className="w-4 h-4 text-primary shrink-0" />
+              <span className="text-xs font-bold text-primary">广播</span>
+              {announcements.length > VISIBLE_COUNT && (
+                <span className="text-[10px] text-muted-foreground ml-auto">{announcements.length} 条</span>
+              )}
+            </div>
+            <div className="px-3 pb-2 space-y-0.5 relative overflow-hidden" style={{ height: `${VISIBLE_COUNT * 28}px` }}>
+              <AnimatePresence mode="popLayout">
+                {Array.from({ length: VISIBLE_COUNT }).map((_, i) => {
+                  const idx = (startIndex + i) % announcements.length;
+                  const item = announcements[idx];
+                  return (
+                    <motion.button
+                      key={`${item.id}-${startIndex}`}
+                      layout
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -10, opacity: 0 }}
+                      transition={{ duration: 0.3, delay: i * 0.05 }}
+                      className="w-full flex items-center gap-1.5 py-1 px-1 rounded-md hover:bg-muted/40 transition-colors text-left cursor-pointer h-[26px]"
+                      onClick={() => setSelectedNews(item)}
+                    >
+                      <span className="text-[11px] font-semibold text-primary shrink-0">{item.tag}</span>
+                      <span className="text-[11px] text-foreground truncate">{item.title}</span>
+                    </motion.button>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
           </div>
-          <div className="px-3 pb-2 space-y-0.5 relative overflow-hidden" style={{ height: `${VISIBLE_COUNT * 28}px` }}>
-            <AnimatePresence mode="popLayout">
-              {Array.from({ length: VISIBLE_COUNT }).map((_, i) => {
-                const idx = (startIndex + i) % announcements.length;
-                const item = announcements[idx];
-                return (
-                  <motion.button
-                    key={`${item.id}-${startIndex}`}
-                    layout
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -10, opacity: 0 }}
-                    transition={{ duration: 0.3, delay: i * 0.05 }}
-                    className="w-full flex items-center gap-1.5 py-1 px-1 rounded-md hover:bg-muted/40 transition-colors text-left cursor-pointer h-[26px]"
-                    onClick={() => setSelectedNews(item)}
-                  >
-                    <span className="text-[11px] font-semibold text-primary shrink-0">{item.tag}</span>
-                    <span className="text-[11px] text-foreground truncate">{item.title}</span>
-                  </motion.button>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Detail Modal */}
