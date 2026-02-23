@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Coffee,
   TrendingUp,
-  FileCheck,
   FileText,
   Package,
   MessageCircle,
@@ -18,12 +17,22 @@ import {
   Zap,
   BookOpen,
   ClipboardList,
+  Megaphone,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+
+const announcements = [
+  "[系统通知] 财务自动结算链路已升级",
+  "[运营战报] 合肥蜀山测试店周日出杯量突破300杯",
+  "[物料上新] 3月春季特调拼配豆已上线",
+  "[培训通知] 本周六新品制作培训直播",
+  "[平台公告] 3月起配送费补贴政策调整",
+  "[运营战报] 全国门店总出杯量突破50万杯",
+];
 
 const taskCards = [
   { id: 1, type: "invoice" as const, title: "开票申请", desc: "客户张先生申请开具¥256发票", tag: "开票" },
@@ -55,6 +64,14 @@ const ProfilePage = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [replyReviewIndex, setReplyReviewIndex] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [marqueeIndex, setMarqueeIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMarqueeIndex((prev) => (prev + 1) % announcements.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   const userInfo = {
     storeName: "KAKAGO 中关村店",
@@ -84,68 +101,67 @@ const ProfilePage = () => {
   ];
 
   const joinBenefits = [
-    {
-      icon: Shield,
-      title: "独立咖啡守护",
-      desc: "抵抗工业化连锁的吞噬，用分布式的力量，捍卫属于独立咖啡馆的生存空间。",
-      accent: true,
-    },
-    {
-      icon: Store,
-      title: "门店绝对独立",
-      desc: "保持原有的价格体系与菜单独立，拒绝平台强制打折。零平台裹挟，无经营负担。",
-    },
-    {
-      icon: Zap,
-      title: "闲置产能变现",
-      desc: "告别低谷期打苍蝇。精准填补非高峰期产能，为你带来持续、稳定的额外收入。",
-    },
-    {
-      icon: TrendingUp,
-      title: "精准用户引流",
-      desc: "拒绝一次性羊毛党。为你精准输送真正懂咖啡的高质量客群，沉淀高频复购的死忠粉。",
-    },
-    {
-      icon: Coffee,
-      title: "AI 智能托管",
-      desc: "统一部署品控与包材。无需操心叫货与营销设置。无入驻门槛，你只管专注萃取出杯。",
-    },
+    { icon: Shield, title: "独立咖啡守护", desc: "抵抗工业化连锁的吞噬，用分布式的力量，捍卫属于独立咖啡馆的生存空间。", accent: true },
+    { icon: Store, title: "门店绝对独立", desc: "保持原有的价格体系与菜单独立，拒绝平台强制打折。零平台裹挟，无经营负担。" },
+    { icon: Zap, title: "闲置产能变现", desc: "告别低谷期打苍蝇。精准填补非高峰期产能，为你带来持续、稳定的额外收入。" },
+    { icon: TrendingUp, title: "精准用户引流", desc: "拒绝一次性羊毛党。为你精准输送真正懂咖啡的高质量客群，沉淀高频复购的死忠粉。" },
+    { icon: Coffee, title: "AI 智能托管", desc: "统一部署品控与包材。无需操心叫货与营销设置。无入驻门槛，你只管专注萃取出杯。" },
   ];
 
+  // Menu item renderer
+  const MenuItem = ({ icon: Icon, label, sub, onClick, badge }: { icon: any; label: string; sub: string; onClick: () => void; badge?: boolean }) => (
+    <button
+      className="w-full flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors text-left"
+      onClick={onClick}
+    >
+      <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center relative shrink-0">
+        <Icon className="w-[18px] h-[18px] text-primary" />
+        {badge && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[15px] font-semibold text-foreground">{label}</p>
+        <p className="text-[13px] text-muted-foreground mt-0.5">{sub}</p>
+      </div>
+      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+    </button>
+  );
+
   return (
-    <div className="p-3 pb-20 space-y-3">
-      {/* Top Cards - Identity & Stats */}
+    <div className="px-3 pb-20 pt-2 space-y-2.5">
+      {/* === Key Asset Cards === */}
       <div className="grid grid-cols-2 gap-2">
+        {/* Identity Card */}
         <Card className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
               <Coffee className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-foreground truncate">{userInfo.storeName}</p>
-              <p className="text-xs text-muted-foreground">{userInfo.role}</p>
+              <p className="text-[15px] font-bold text-foreground truncate">{userInfo.storeName}</p>
+              <p className="text-[13px] text-muted-foreground">{userInfo.role}</p>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            商户ID: {userInfo.merchantId}
+          <Badge variant="outline" className="text-[11px] text-muted-foreground">
+            {userInfo.merchantId}
           </Badge>
         </Card>
 
+        {/* Revenue Card */}
         <Card className="glass-card p-3">
-          <p className="text-xs text-muted-foreground mb-1">累计收益</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl font-bold text-primary">¥{userInfo.totalEarnings.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-3 mt-1.5">
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-bold text-foreground">{userInfo.totalCups}</span>
-              <span className="text-[10px] text-muted-foreground">杯</span>
+          <p className="text-[13px] text-muted-foreground mb-1">累计收益</p>
+          <span className="text-[22px] font-extrabold text-primary leading-tight">
+            ¥{userInfo.totalEarnings.toLocaleString()}
+          </span>
+          <div className="flex items-center gap-2.5 mt-1.5">
+            <div className="flex items-center gap-0.5">
+              <span className="text-[15px] font-bold text-foreground">{userInfo.totalCups}</span>
+              <span className="text-[11px] text-muted-foreground">杯</span>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-bold text-foreground">{userInfo.daysJoined}</span>
-              <span className="text-[10px] text-muted-foreground">天</span>
+            <div className="flex items-center gap-0.5">
+              <span className="text-[15px] font-bold text-foreground">{userInfo.daysJoined}</span>
+              <span className="text-[11px] text-muted-foreground">天</span>
             </div>
-            <Badge className="bg-success/20 text-success text-[10px]">
+            <Badge className="bg-primary/20 text-primary text-[11px] font-bold border-0">
               <TrendingUp className="w-3 h-3 mr-0.5" />
               +12%
             </Badge>
@@ -153,109 +169,64 @@ const ProfilePage = () => {
         </Card>
       </div>
 
-      {/* Menu Items */}
-      <Card className="glass-card divide-y divide-border">
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
+      {/* === Compact Broadcast Marquee === */}
+      <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 overflow-hidden">
+        <Megaphone className="w-3.5 h-3.5 text-primary shrink-0" />
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <p
+            key={marqueeIndex}
+            className="text-[12px] text-muted-foreground truncate animate-fade-in"
+          >
+            {announcements[marqueeIndex]}
+          </p>
+        </div>
+        <span className="text-[10px] text-primary shrink-0">{announcements.length}条</span>
+      </button>
+
+      {/* === Menu Group 1: Tasks & Reviews === */}
+      <Card className="glass-card overflow-hidden">
+        <div className="px-3 pt-2.5 pb-1">
+          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">任务与评价</span>
+        </div>
+        <MenuItem
+          icon={FileText}
+          label="待办清单"
+          sub={`${taskCards.length} 项待处理`}
           onClick={() => setShowTodoSheet(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center relative">
-            <FileText className="w-4 h-4 text-primary" />
-            {taskCards.some(t => t.urgent) && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">待办清单</p>
-            <p className="text-xs text-muted-foreground">{taskCards.length} 项待处理</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
+          badge={taskCards.some(t => t.urgent)}
+        />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem
+          icon={Star}
+          label="客户评价"
+          sub={`评分 4.8 · ${recentReviews.length} 条新评价`}
           onClick={() => setShowReviewSheet(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Star className="w-4 h-4 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">客户评价</p>
-            <p className="text-xs text-muted-foreground">评分 4.8 · {recentReviews.length} 条新评价</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
-          onClick={() => setShowStoreSheet(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
-            <Store className="w-4 h-4 text-muted-foreground" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">门店资料</p>
-            <p className="text-xs text-muted-foreground">上传/修改门店信息</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
-          onClick={() => setShowJoinDialog(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Coffee className="w-4 h-4 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">开启合作</p>
-            <p className="text-xs text-muted-foreground">加入我们，一起成长</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
-          onClick={() => setShowGuideSheet(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
-            <BookOpen className="w-4 h-4 text-muted-foreground" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">经营须知</p>
-            <p className="text-xs text-muted-foreground">门店运营规范与注意事项</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
-          onClick={() => setShowSopSheet(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center">
-            <ClipboardList className="w-4 h-4 text-muted-foreground" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">产品SOP</p>
-            <p className="text-xs text-muted-foreground">标准制作流程与品控规范</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
-
-        <button
-          className="w-full flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-left"
-          onClick={() => setShowInviteSheet(true)}
-        >
-          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
-            <UserPlus className="w-4 h-4 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">邀请伙伴加入</p>
-            <p className="text-xs text-muted-foreground">邀请店员加入系统，自助上下线</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </button>
+        />
       </Card>
 
-      <p className="text-center text-xs text-muted-foreground pt-2">
+      {/* === Menu Group 2: Store Management === */}
+      <Card className="glass-card overflow-hidden">
+        <div className="px-3 pt-2.5 pb-1">
+          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">门店管理</span>
+        </div>
+        <MenuItem icon={Store} label="门店资料" sub="上传/修改门店信息" onClick={() => setShowStoreSheet(true)} />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem icon={BookOpen} label="经营须知" sub="门店运营规范与注意事项" onClick={() => setShowGuideSheet(true)} />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem icon={ClipboardList} label="产品SOP" sub="标准制作流程与品控规范" onClick={() => setShowSopSheet(true)} />
+      </Card>
+
+      {/* === Menu Group 3: Growth & Partners === */}
+      <Card className="glass-card overflow-hidden">
+        <div className="px-3 pt-2.5 pb-1">
+          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">增长与合作</span>
+        </div>
+        <MenuItem icon={Coffee} label="开启合作" sub="加入我们，一起成长" onClick={() => setShowJoinDialog(true)} />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem icon={UserPlus} label="邀请伙伴加入" sub="邀请店员加入系统，自助上下线" onClick={() => setShowInviteSheet(true)} />
+      </Card>
+
+      <p className="text-center text-[11px] text-muted-foreground pt-1">
         KAKAGO v1.0.0
       </p>
 
@@ -278,7 +249,7 @@ const ProfilePage = () => {
                 {section.items.map((item, j) => (
                   <div key={j} className="flex items-start gap-2">
                     <span className="text-primary text-xs mt-0.5">-</span>
-                    <span className="text-xs text-muted-foreground leading-relaxed">{item}</span>
+                    <span className="text-[13px] text-muted-foreground leading-relaxed">{item}</span>
                   </div>
                 ))}
               </div>
@@ -309,7 +280,7 @@ const ProfilePage = () => {
                 {product.steps.map((step, j) => (
                   <div key={j} className="flex items-start gap-2">
                     <span className="text-[11px] font-bold text-primary w-4 shrink-0">{j + 1}.</span>
-                    <span className="text-xs text-muted-foreground leading-relaxed">{step}</span>
+                    <span className="text-[13px] text-muted-foreground leading-relaxed">{step}</span>
                   </div>
                 ))}
               </div>
@@ -361,15 +332,12 @@ const ProfilePage = () => {
       <Sheet open={showJoinDialog} onOpenChange={setShowJoinDialog}>
         <SheetContent side="bottom" className="bg-background border-t border-border h-[90vh]">
           <div className="overflow-y-auto max-h-[calc(90vh-20px)] pb-6">
-            {/* Hero */}
             <div className="relative bg-gradient-to-b from-primary/20 via-background to-background pt-5 pb-2 px-4 text-center -mx-6 -mt-2">
               <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-1.5">
                 <Coffee className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="text-[17px] font-bold text-foreground mb-0.5">
-                接入 KAKAGO 咖啡网络
-              </h2>
-              <p className="text-xs text-muted-foreground leading-snug max-w-[300px] mx-auto">
+              <h2 className="text-[17px] font-bold text-foreground mb-0.5">接入 KAKAGO 咖啡网络</h2>
+              <p className="text-[13px] text-muted-foreground leading-snug max-w-[300px] mx-auto">
                 让闲置产能变现，成为全城精品咖啡基础设施。
               </p>
               <div className="flex justify-center gap-2 mt-2.5 flex-wrap">
@@ -380,8 +348,6 @@ const ProfilePage = () => {
                 ))}
               </div>
             </div>
-
-            {/* Benefits */}
             <div className="space-y-2 mt-4">
               {joinBenefits.map((b, i) => {
                 const Icon = b.icon;
@@ -389,47 +355,30 @@ const ProfilePage = () => {
                   <div
                     key={i}
                     className={`rounded-xl px-4 py-3.5 border transition-all ${
-                      b.accent
-                        ? "bg-primary/10 border-primary/30"
-                        : "bg-secondary/50 border-transparent"
+                      b.accent ? "bg-primary/10 border-primary/30" : "bg-secondary/50 border-transparent"
                     }`}
-                    style={b.accent ? { boxShadow: '0 0 20px hsl(271 81% 56% / 0.15)' } : undefined}
+                    style={b.accent ? { boxShadow: '0 0 20px hsl(270 100% 65% / 0.15)' } : undefined}
                   >
                     <h3 className="text-sm font-bold text-foreground mb-1 tracking-tight flex items-center gap-1.5">
                       <Icon className="w-4 h-4 text-primary" />
                       {b.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed pl-5.5">{b.desc}</p>
+                    <p className="text-[13px] text-muted-foreground leading-relaxed pl-5.5">{b.desc}</p>
                   </div>
                 );
               })}
             </div>
-
-            {/* CTA */}
             <div className="mt-4 space-y-2">
               <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/10 border border-primary/30">
-                <input
-                  type="checkbox"
-                  checked={agreedToTerms}
-                  onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="mt-0.5 accent-primary"
-                />
-                <p className="text-[11px] text-muted-foreground">
-                  我已阅读并同意《KAKAGO合作商户协议》和《数据保护条款》
-                </p>
+                <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-0.5 accent-primary" />
+                <p className="text-[11px] text-muted-foreground">我已阅读并同意《KAKAGO合作商户协议》和《数据保护条款》</p>
               </div>
-              <Button
-                className="w-full bg-primary"
-                disabled={!agreedToTerms}
-                onClick={() => { alert("申请已提交，我们将尽快与您联系！"); setShowJoinDialog(false); }}
-              >
+              <Button className="w-full bg-primary" disabled={!agreedToTerms} onClick={() => { alert("申请已提交，我们将尽快与您联系！"); setShowJoinDialog(false); }}>
                 <Coffee className="w-4 h-4 mr-1" />
                 立即申请接入网络
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
-              <p className="text-center text-[9px] text-muted-foreground/50">
-                提交申请后，24小时内将有工作人员与您联系
-              </p>
+              <p className="text-center text-[9px] text-muted-foreground/50">提交申请后，24小时内将有工作人员与您联系</p>
             </div>
           </div>
         </SheetContent>
@@ -442,14 +391,14 @@ const ProfilePage = () => {
             <SheetTitle>邀请伙伴加入</SheetTitle>
           </SheetHeader>
           <div className="space-y-4 overflow-y-auto max-h-[calc(60vh-80px)] pb-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               邀请门店伙伴注册并加入此系统，让每位店员都可以自主上线/下线，无需老板在场操作。
             </p>
             <div className="space-y-2">
               {["伙伴可自助上线/下线门店", "伙伴可查看并接单", "订单操作记录清晰可追溯", "老板可随时管理伙伴权限"].map((item, i) => (
                 <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-secondary/30">
                   <span className="text-primary text-sm">✓</span>
-                  <span className="text-sm text-foreground">{item}</span>
+                  <span className="text-[13px] text-foreground">{item}</span>
                 </div>
               ))}
             </div>
@@ -479,11 +428,11 @@ const ProfilePage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-foreground">{task.title}</span>
+                      <span className="text-[13px] font-semibold text-foreground">{task.title}</span>
                       <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-muted-foreground/30 text-muted-foreground">{task.tag}</Badge>
                       {task.urgent && <AlertTriangle className="w-3 h-3 text-destructive" />}
                     </div>
-                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
+                    <p className="text-[12px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
                   </div>
                   <Button variant="ghost" size="sm" className="text-[11px] h-7 px-3 text-primary shrink-0">去处理</Button>
                 </div>
@@ -514,7 +463,7 @@ const ProfilePage = () => {
                       <Star key={j} className={`w-3 h-3 ${j < review.rating ? "text-primary fill-primary" : "text-muted"}`} />
                     ))}
                   </div>
-                  <span className="text-xs text-foreground truncate">{review.comment}</span>
+                  <span className="text-[13px] text-foreground truncate">{review.comment}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 ml-2">
                   <span className="text-[10px] text-muted-foreground">{review.time}</span>
@@ -540,7 +489,7 @@ const ProfilePage = () => {
                     <Star key={j} className={`w-2.5 h-2.5 ${j < recentReviews[replyReviewIndex].rating ? "text-primary fill-primary" : "text-muted"}`} />
                   ))}
                 </div>
-                <span className="text-xs text-foreground">{recentReviews[replyReviewIndex].comment}</span>
+                <span className="text-[13px] text-foreground">{recentReviews[replyReviewIndex].comment}</span>
               </div>
               <Textarea
                 placeholder="输入回复内容..."
