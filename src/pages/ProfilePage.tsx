@@ -205,6 +205,13 @@ const ProfilePage = () => {
           sub={`评分 4.8 · ${recentReviews.length} 条新评价`}
           onClick={() => setShowReviewSheet(true)}
         />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem
+          icon={Receipt}
+          label="开票管理"
+          sub="处理客户开票申请"
+          onClick={() => navigate("/invoice")}
+        />
       </Card>
 
       {/* === Menu Group 2: Store Management === */}
