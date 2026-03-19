@@ -19,6 +19,7 @@ import {
   BookOpen,
   ClipboardList,
   Megaphone,
+  Receipt,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
