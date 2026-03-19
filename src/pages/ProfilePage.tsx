@@ -444,7 +444,19 @@ const ProfilePage = () => {
                     </div>
                     <p className="text-[12px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-[11px] h-7 px-3 text-primary shrink-0">去处理</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-[11px] h-7 px-3 text-primary shrink-0"
+                    onClick={() => {
+                      if (task.type === "invoice") {
+                        setShowTodoSheet(false);
+                        navigate("/invoice");
+                      }
+                    }}
+                  >
+                    去处理
+                  </Button>
                 </div>
               );
             })}
