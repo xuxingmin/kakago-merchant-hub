@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ import {
   BookOpen,
   ClipboardList,
   Megaphone,
+  Receipt,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -54,6 +56,7 @@ const recentReviews = [
 ];
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [showStoreSheet, setShowStoreSheet] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [showInviteSheet, setShowInviteSheet] = useState(false);
@@ -201,6 +204,13 @@ const ProfilePage = () => {
           label="客户评价"
           sub={`评分 4.8 · ${recentReviews.length} 条新评价`}
           onClick={() => setShowReviewSheet(true)}
+        />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem
+          icon={Receipt}
+          label="开票管理"
+          sub="处理客户开票申请"
+          onClick={() => navigate("/invoice")}
         />
       </Card>
 
@@ -434,7 +444,19 @@ const ProfilePage = () => {
                     </div>
                     <p className="text-[12px] text-muted-foreground truncate mt-0.5">{task.desc}</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-[11px] h-7 px-3 text-primary shrink-0">去处理</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-[11px] h-7 px-3 text-primary shrink-0"
+                    onClick={() => {
+                      if (task.type === "invoice") {
+                        setShowTodoSheet(false);
+                        navigate("/invoice");
+                      }
+                    }}
+                  >
+                    去处理
+                  </Button>
                 </div>
               );
             })}

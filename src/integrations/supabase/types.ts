@@ -103,6 +103,75 @@ export type Database = {
           },
         ]
       }
+      invoice_requests: {
+        Row: {
+          amount: number
+          company_name: string | null
+          completed_at: string | null
+          created_at: string
+          customer_email: string | null
+          customer_id: string
+          id: string
+          invoice_url: string | null
+          order_id: string | null
+          order_no: string
+          reject_reason: string | null
+          status: string
+          store_id: string
+          tax_number: string | null
+          title_type: string
+        }
+        Insert: {
+          amount: number
+          company_name?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_id: string
+          id?: string
+          invoice_url?: string | null
+          order_id?: string | null
+          order_no: string
+          reject_reason?: string | null
+          status?: string
+          store_id: string
+          tax_number?: string | null
+          title_type?: string
+        }
+        Update: {
+          amount?: number
+          company_name?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_id?: string
+          id?: string
+          invoice_url?: string | null
+          order_id?: string | null
+          order_no?: string
+          reject_reason?: string | null
+          status?: string
+          store_id?: string
+          tax_number?: string | null
+          title_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_requests_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       membership_levels: {
         Row: {
           benefits: Json | null

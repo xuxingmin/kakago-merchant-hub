@@ -10,6 +10,7 @@ import DataPage from "./pages/DataPage";
 import InventoryPage from "./pages/InventoryPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettlementPage from "./pages/SettlementPage";
+import InvoicePage from "./pages/InvoicePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const AppContent = () => {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/settlement" element={<SettlementPage />} />
+        <Route path="/invoice" element={<InvoicePage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
