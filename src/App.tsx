@@ -28,6 +28,7 @@ const AppContent = () => {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/settlement" element={<SettlementPage />} />
+        <Route path="/invoice" element={<InvoicePage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <BottomNav />
