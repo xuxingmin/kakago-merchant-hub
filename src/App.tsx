@@ -10,6 +10,7 @@ import DataPage from "./pages/DataPage";
 import InventoryPage from "./pages/InventoryPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettlementPage from "./pages/SettlementPage";
+import InvoicePage from "./pages/InvoicePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
