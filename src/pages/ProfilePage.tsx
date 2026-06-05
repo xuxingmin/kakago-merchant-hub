@@ -207,6 +207,7 @@ const ProfilePage = () => {
           sub={`${taskCards.length} 项待处理`}
           onClick={() => setShowTodoSheet(true)}
           badge={taskCards.some(t => t.urgent)}
+          locked={reviewLocked}
         />
         <div className="mx-3 h-px bg-border/40" />
         <MenuItem
@@ -214,6 +215,7 @@ const ProfilePage = () => {
           label="客户评价"
           sub={`评分 4.8 · ${recentReviews.length} 条新评价`}
           onClick={() => setShowReviewSheet(true)}
+          locked={reviewLocked}
         />
         <div className="mx-3 h-px bg-border/40" />
         <MenuItem
@@ -221,6 +223,7 @@ const ProfilePage = () => {
           label="开票管理"
           sub="处理客户开票申请"
           onClick={() => navigate("/invoice")}
+          locked={reviewLocked}
         />
       </Card>
 
