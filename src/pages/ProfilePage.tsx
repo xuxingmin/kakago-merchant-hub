@@ -319,14 +319,20 @@ const ProfilePage = () => {
             <SheetTitle>门店资料</SheetTitle>
           </SheetHeader>
           <div className="space-y-4 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
+            {storeReadOnly && (
+              <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2">
+                <Lock className="w-4 h-4 text-primary shrink-0" />
+                <p className="text-[12px] text-foreground">签约期间门店资料锁定为只读，以确保合同与证照一致</p>
+              </div>
+            )}
             <div className="space-y-3">
               {storeFields.map((field) => (
                 <div key={field.key} className="space-y-1">
                   <Label className="text-xs text-muted-foreground">{field.label}</Label>
                   {field.multiline ? (
-                    <Textarea placeholder={field.placeholder} className="min-h-[60px] text-sm" />
+                    <Textarea placeholder={field.placeholder} className="min-h-[60px] text-sm" readOnly={storeReadOnly} disabled={storeReadOnly} />
                   ) : (
-                    <Input placeholder={field.placeholder} className="h-9 text-sm" />
+                    <Input placeholder={field.placeholder} className="h-9 text-sm" readOnly={storeReadOnly} disabled={storeReadOnly} />
                   )}
                 </div>
               ))}
@@ -337,16 +343,16 @@ const ProfilePage = () => {
                 {uploadFields.map((field) => (
                   <div
                     key={field.key}
-                    className="p-4 rounded-lg border border-dashed border-border bg-secondary/20 flex flex-col items-center justify-center cursor-pointer hover:bg-secondary/40 transition-colors"
+                    className={`p-4 rounded-lg border border-dashed border-border bg-secondary/20 flex flex-col items-center justify-center transition-colors ${storeReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-secondary/40"}`}
                   >
                     <Store className="w-6 h-6 text-muted-foreground mb-1" />
                     <span className="text-xs text-muted-foreground">{field.label}</span>
-                    <span className="text-[10px] text-primary mt-1">点击上传</span>
+                    <span className="text-[10px] text-primary mt-1">{storeReadOnly ? "已锁定" : "点击上传"}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <Button className="w-full bg-primary mt-4">保存资料</Button>
+            {!storeReadOnly && <Button className="w-full bg-primary mt-4">保存资料</Button>}
           </div>
         </SheetContent>
       </Sheet>
