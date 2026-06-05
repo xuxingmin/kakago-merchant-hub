@@ -117,20 +117,25 @@ const ProfilePage = () => {
   ];
 
   // Menu item renderer
-  const MenuItem = ({ icon: Icon, label, sub, onClick, badge }: { icon: any; label: string; sub: string; onClick: () => void; badge?: boolean }) => (
+  const MenuItem = ({ icon: Icon, label, sub, onClick, badge, locked }: { icon: any; label: string; sub: string; onClick: () => void; badge?: boolean; locked?: boolean }) => (
     <button
-      className="w-full flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors text-left"
-      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-3 py-3 transition-colors text-left ${locked ? "opacity-50 cursor-not-allowed" : "hover:bg-secondary/50"}`}
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
     >
       <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center relative shrink-0">
         <Icon className="w-[18px] h-[18px] text-primary" />
-        {badge && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
+        {badge && !locked && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[15px] font-semibold text-foreground">{label}</p>
-        <p className="text-[13px] text-muted-foreground mt-0.5">{sub}</p>
+        <p className="text-[13px] text-muted-foreground mt-0.5">{locked ? "资料审核通过后开通" : sub}</p>
       </div>
-      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+      {locked ? (
+        <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+      ) : (
+        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+      )}
     </button>
   );
 
