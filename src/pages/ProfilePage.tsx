@@ -20,12 +20,14 @@ import {
   ClipboardList,
   Megaphone,
   Receipt,
+  Lock,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useOnboarding } from "@/contexts/OnboardingContext";
 
 const announcements = [
   "[系统通知] 财务自动结算链路已升级",
@@ -57,6 +59,9 @@ const recentReviews = [
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { stage } = useOnboarding();
+  const storeReadOnly = stage === "signing";
+  const reviewLocked = stage === "review";
   const [showStoreSheet, setShowStoreSheet] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [showInviteSheet, setShowInviteSheet] = useState(false);
@@ -112,20 +117,25 @@ const ProfilePage = () => {
   ];
 
   // Menu item renderer
-  const MenuItem = ({ icon: Icon, label, sub, onClick, badge }: { icon: any; label: string; sub: string; onClick: () => void; badge?: boolean }) => (
+  const MenuItem = ({ icon: Icon, label, sub, onClick, badge, locked }: { icon: any; label: string; sub: string; onClick: () => void; badge?: boolean; locked?: boolean }) => (
     <button
-      className="w-full flex items-center gap-3 px-3 py-3 hover:bg-secondary/50 transition-colors text-left"
-      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-3 py-3 transition-colors text-left ${locked ? "opacity-50 cursor-not-allowed" : "hover:bg-secondary/50"}`}
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
     >
       <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center relative shrink-0">
         <Icon className="w-[18px] h-[18px] text-primary" />
-        {badge && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
+        {badge && !locked && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-destructive" />}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[15px] font-semibold text-foreground">{label}</p>
-        <p className="text-[13px] text-muted-foreground mt-0.5">{sub}</p>
+        <p className="text-[13px] text-muted-foreground mt-0.5">{locked ? "资料审核通过后开通" : sub}</p>
       </div>
-      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+      {locked ? (
+        <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+      ) : (
+        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+      )}
     </button>
   );
 
@@ -197,6 +207,7 @@ const ProfilePage = () => {
           sub={`${taskCards.length} 项待处理`}
           onClick={() => setShowTodoSheet(true)}
           badge={taskCards.some(t => t.urgent)}
+          locked={reviewLocked}
         />
         <div className="mx-3 h-px bg-border/40" />
         <MenuItem
@@ -204,6 +215,7 @@ const ProfilePage = () => {
           label="客户评价"
           sub={`评分 4.8 · ${recentReviews.length} 条新评价`}
           onClick={() => setShowReviewSheet(true)}
+          locked={reviewLocked}
         />
         <div className="mx-3 h-px bg-border/40" />
         <MenuItem
@@ -211,6 +223,7 @@ const ProfilePage = () => {
           label="开票管理"
           sub="处理客户开票申请"
           onClick={() => navigate("/invoice")}
+          locked={reviewLocked}
         />
       </Card>
 
@@ -306,14 +319,20 @@ const ProfilePage = () => {
             <SheetTitle>门店资料</SheetTitle>
           </SheetHeader>
           <div className="space-y-4 overflow-y-auto max-h-[calc(85vh-80px)] pb-4">
+            {storeReadOnly && (
+              <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2">
+                <Lock className="w-4 h-4 text-primary shrink-0" />
+                <p className="text-[12px] text-foreground">签约期间门店资料锁定为只读，以确保合同与证照一致</p>
+              </div>
+            )}
             <div className="space-y-3">
               {storeFields.map((field) => (
                 <div key={field.key} className="space-y-1">
                   <Label className="text-xs text-muted-foreground">{field.label}</Label>
                   {field.multiline ? (
-                    <Textarea placeholder={field.placeholder} className="min-h-[60px] text-sm" />
+                    <Textarea placeholder={field.placeholder} className="min-h-[60px] text-sm" readOnly={storeReadOnly} disabled={storeReadOnly} />
                   ) : (
-                    <Input placeholder={field.placeholder} className="h-9 text-sm" />
+                    <Input placeholder={field.placeholder} className="h-9 text-sm" readOnly={storeReadOnly} disabled={storeReadOnly} />
                   )}
                 </div>
               ))}
@@ -324,16 +343,16 @@ const ProfilePage = () => {
                 {uploadFields.map((field) => (
                   <div
                     key={field.key}
-                    className="p-4 rounded-lg border border-dashed border-border bg-secondary/20 flex flex-col items-center justify-center cursor-pointer hover:bg-secondary/40 transition-colors"
+                    className={`p-4 rounded-lg border border-dashed border-border bg-secondary/20 flex flex-col items-center justify-center transition-colors ${storeReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-secondary/40"}`}
                   >
                     <Store className="w-6 h-6 text-muted-foreground mb-1" />
                     <span className="text-xs text-muted-foreground">{field.label}</span>
-                    <span className="text-[10px] text-primary mt-1">点击上传</span>
+                    <span className="text-[10px] text-primary mt-1">{storeReadOnly ? "已锁定" : "点击上传"}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <Button className="w-full bg-primary mt-4">保存资料</Button>
+            {!storeReadOnly && <Button className="w-full bg-primary mt-4">保存资料</Button>}
           </div>
         </SheetContent>
       </Sheet>
