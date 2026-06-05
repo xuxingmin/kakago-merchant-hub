@@ -105,7 +105,9 @@ const ProfilePage = () => {
     { key: "license", label: "营业执照" },
     { key: "foodPermit", label: "食品安全许可证" },
     { key: "healthCert", label: "健康证" },
-    { key: "storePhotos", label: "门店照片" },
+    // 拆分门店照片为门头照与店内照，字段与总部后台 1:1 对齐
+    { key: "store_front_chaoyang", label: "门头照", hint: "请清晰拍摄店铺招牌与沿街全景" },
+    { key: "store_interior_chaoyang", label: "店内照", hint: "请拍摄店内操作区或堂食环境" },
   ];
 
   const joinBenefits = [
