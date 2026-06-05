@@ -59,6 +59,9 @@ const recentReviews = [
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { stage } = useOnboarding();
+  const storeReadOnly = stage === "signing";
+  const reviewLocked = stage === "review";
   const [showStoreSheet, setShowStoreSheet] = useState(false);
   const [showJoinDialog, setShowJoinDialog] = useState(false);
   const [showInviteSheet, setShowInviteSheet] = useState(false);
