@@ -22,7 +22,7 @@ const StageSwitcher = () => {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-20 right-3 z-[150] flex h-11 w-11 items-center justify-center rounded-full border border-primary/40 bg-card/90 text-primary backdrop-blur-md"
+        className="fixed bottom-20 right-3 z-[250] flex h-11 w-11 items-center justify-center rounded-full border border-primary/40 bg-card/90 text-primary backdrop-blur-md"
         style={{ boxShadow: "0 0 16px hsl(270 100% 65% / 0.3)" }}
         aria-label="切换商家阶段(演示)"
       >
@@ -30,7 +30,7 @@ const StageSwitcher = () => {
       </button>
 
       {open && (
-        <div className="fixed bottom-32 right-3 z-[150] w-56 rounded-xl border border-border bg-card p-2 shadow-xl">
+        <div className="fixed bottom-32 right-3 z-[250] w-56 rounded-xl border border-border bg-card p-2 shadow-xl">
           <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             演示：商家阶段切换
           </p>
