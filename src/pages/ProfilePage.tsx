@@ -345,10 +345,11 @@ const ProfilePage = () => {
                 {uploadFields.map((field) => (
                   <div
                     key={field.key}
-                    className={`p-4 rounded-lg border border-dashed border-border bg-secondary/20 flex flex-col items-center justify-center transition-colors ${storeReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-secondary/40"}`}
+                    className={`p-4 rounded-lg border border-dashed border-border bg-secondary/20 flex flex-col items-center justify-center text-center transition-colors ${storeReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-secondary/40"}`}
                   >
                     <Store className="w-6 h-6 text-muted-foreground mb-1" />
-                    <span className="text-xs text-muted-foreground">{field.label}</span>
+                    <span className="text-xs text-foreground">{field.label}</span>
+                    {field.hint && <span className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{field.hint}</span>}
                     <span className="text-[10px] text-primary mt-1">{storeReadOnly ? "已锁定" : "点击上传"}</span>
                   </div>
                 ))}
