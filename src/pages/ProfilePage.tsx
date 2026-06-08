@@ -20,6 +20,7 @@ import {
   ClipboardList,
   Megaphone,
   Receipt,
+  ScrollText,
   Lock,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
