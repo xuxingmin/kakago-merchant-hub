@@ -14,6 +14,7 @@ import InventoryPage from "./pages/InventoryPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettlementPage from "./pages/SettlementPage";
 import InvoicePage from "./pages/InvoicePage";
+import ComplaintsPage from "./pages/ComplaintsPage";
 import SigningChamber from "./pages/SigningChamber";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const AppContent = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settlement" element={<SettlementPage />} />
           <Route path="/invoice" element={<InvoicePage />} />
+          <Route path="/complaints" element={<ComplaintsPage />} />
           <Route path="/signing" element={<SigningChamber />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

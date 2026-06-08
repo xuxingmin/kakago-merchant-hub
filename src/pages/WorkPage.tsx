@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ChefHat, Clock, History } from "lucide-react";
+import { Truck, ChefHat, Clock, History, Printer, Zap } from "lucide-react";
 import SwipeableOrderCard from "@/components/SwipeableOrderCard";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -33,9 +34,52 @@ const mockOrders: Order[] = [
   { id: "K010", items: [{ name: "热美式", qty: 2 }], status: "delivering", orderTime: 650 },
 ];
 
+// 总部 HQ 批准的「原单补发」单据：无需手动接单，直接空降进入【制作中】并置顶。
+// liability 由总部初审定责，驱动杯贴加印标签与卡片底部文案的动态渲染。
+type Liability = "logistics" | "merchant" | "platform";
+
+interface ResendOrder {
+  id: string;
+  items: { name: string; qty: number }[];
+  liability: Liability;
+}
+
+const resendOrders: ResendOrder[] = [
+  { id: "K004", items: [{ name: "拿铁（热）", qty: 1 }], liability: "logistics" },
+  { id: "K005", items: [{ name: "澳白（冰）", qty: 1 }], liability: "merchant" },
+];
+
+// 杯贴底部加印标签
+const resendLabel = (l: Liability) => (l === "merchant" ? "【责任补发】" : "【加急补发】");
+
+// 卡片底部动态提示文案
+const resendNote = (l: Liability) => {
+  switch (l) {
+    case "logistics":
+      return "原单因物流原因异常，本单为总部加急补发单。本店仅负责出餐，本单对应的制作费用仍将正常计算并计入您的本期结算账单。";
+    case "platform":
+      return "本单为总部客情维护加急补发单。本店仅负责出餐，本单对应的制作费用仍将正常计算并计入您的本期结算账单。";
+    case "merchant":
+      return "原单因门店原因（做错/漏送/包装）发起客诉，本单为责任重做单，不计入出餐制作费用，且本单产生的二次配送费与物料成本将从您的本期营业额中划扣。如有异议，可去【客诉违规记录】发起申诉。";
+  }
+};
+
 const WorkPage = () => {
+  const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>(mockOrders);
   const [activeTab, setActiveTab] = useState<"order" | "delivery">("order");
+
+  // 补发单空降瞬间：强制抢占联动小票打印机与标签机自动打印
+  useEffect(() => {
+    if (resendOrders.length > 0) {
+      toast({
+        title: "加急补发单已空降制作中",
+        description: `已强制联动小票打印机与标签机，自动打印 ${resendOrders.length} 张出餐小票与杯贴`,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
@@ -230,12 +274,50 @@ const WorkPage = () => {
                   <h2 className="text-sm font-bold">制作中</h2>
                   <span className="text-xs text-muted-foreground ml-1">完成制作→小票扫码→骑手取货</span>
                 </div>
-                <span className="text-lg font-bold text-foreground">{productionOrders.length}</span>
+                <span className="text-lg font-bold text-foreground">{productionOrders.length + resendOrders.length}</span>
               </div>
-              
-              {productionOrders.length > 0 ? (
+
+              {(productionOrders.length > 0 || resendOrders.length > 0) ? (
                 <div className="space-y-1.5">
+                  {/* 补发单置顶：总部批准后空降，无需手动接单 */}
+                  {resendOrders.map(order => (
+                    <div
+                      key={`resend-${order.id}`}
+                      className="px-2.5 py-2 rounded-lg bg-primary/10 border border-primary/40"
+                      style={{ boxShadow: "0 0 16px hsl(270 100% 65% / 0.18)" }}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className="font-mono text-lg font-bold text-foreground">
+                              #{order.id} <span className="text-primary">(补发单)</span>
+                            </span>
+                            <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4 gap-0.5">
+                              <Zap className="w-2.5 h-2.5" />
+                              {resendLabel(order.liability)}
+                            </Badge>
+                            <span className="flex items-center gap-0.5 text-[10px] text-primary">
+                              <Printer className="w-3 h-3" />
+                              已自动出票
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {formatItems(order.items).map((item, i) => (
+                              <span key={i} className="text-sm font-medium text-foreground">{item}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <Badge className="px-2.5 py-1 text-xs shrink-0 bg-primary/80 text-primary-foreground border-primary/80">
+                          制作中
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-muted-foreground mt-1.5 pt-1.5 border-t border-primary/20">
+                        {resendNote(order.liability)}
+                      </p>
+                    </div>
+                  ))}
                   {productionOrders.map(order => (
+
                     order.status === "ready" ? (
                       <SwipeableOrderCard
                         key={order.id}

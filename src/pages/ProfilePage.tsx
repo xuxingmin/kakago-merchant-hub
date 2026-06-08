@@ -20,6 +20,7 @@ import {
   ClipboardList,
   Megaphone,
   Receipt,
+  ScrollText,
   Lock,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -28,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useOnboarding } from "@/contexts/OnboardingContext";
+import { hasPendingComplaintAppeal } from "./ComplaintsPage";
 
 const announcements = [
   "[系统通知] 财务自动结算链路已升级",
@@ -225,6 +227,15 @@ const ProfilePage = () => {
           label="开票管理"
           sub="处理客户开票申请"
           onClick={() => navigate("/invoice")}
+          locked={reviewLocked}
+        />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem
+          icon={ScrollText}
+          label="客诉违规记录"
+          sub="查看扣款处罚与发起申诉"
+          onClick={() => navigate("/complaints")}
+          badge={hasPendingComplaintAppeal()}
           locked={reviewLocked}
         />
       </Card>
