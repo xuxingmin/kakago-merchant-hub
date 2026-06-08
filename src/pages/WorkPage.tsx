@@ -307,9 +307,12 @@ const WorkPage = () => {
                             ))}
                           </div>
                         </div>
-                        <Badge className="px-2.5 py-1 text-xs shrink-0 bg-primary/80 text-primary-foreground border-primary/80">
-                          制作中
-                        </Badge>
+                        <Button
+                          onClick={() => handleOpenCancel(order.id)}
+                          className="w-20 h-9 text-xs font-bold shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground"
+                        >
+                          紧急取消
+                        </Button>
                       </div>
                       <p className="text-[11px] leading-relaxed text-muted-foreground mt-1.5 pt-1.5 border-t border-primary/20">
                         {resendNote(order.liability)}
