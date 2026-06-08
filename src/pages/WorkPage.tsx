@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ChefHat, Clock, History } from "lucide-react";
+import { Truck, ChefHat, Clock, History, Printer, Zap } from "lucide-react";
 import SwipeableOrderCard from "@/components/SwipeableOrderCard";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
