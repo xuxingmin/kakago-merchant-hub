@@ -40,6 +40,7 @@ const AppContent = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settlement" element={<SettlementPage />} />
           <Route path="/invoice" element={<InvoicePage />} />
+          <Route path="/complaints" element={<ComplaintsPage />} />
           <Route path="/signing" element={<SigningChamber />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
