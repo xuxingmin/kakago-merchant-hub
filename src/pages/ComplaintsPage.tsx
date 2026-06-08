@@ -55,6 +55,12 @@ const initialComplaints: Complaint[] = [
   },
 ];
 
+// 是否存在「48小时申诉倒计时内且未处理」的违规单据，供入口红点提示使用
+export const hasPendingComplaintAppeal = () =>
+  initialComplaints.some(
+    (c) => c.status === "pending" && Date.now() - c.notifiedAt < APPEAL_WINDOW_MS,
+  );
+
 const ComplaintsPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
