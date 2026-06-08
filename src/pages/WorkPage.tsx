@@ -274,12 +274,50 @@ const WorkPage = () => {
                   <h2 className="text-sm font-bold">制作中</h2>
                   <span className="text-xs text-muted-foreground ml-1">完成制作→小票扫码→骑手取货</span>
                 </div>
-                <span className="text-lg font-bold text-foreground">{productionOrders.length}</span>
+                <span className="text-lg font-bold text-foreground">{productionOrders.length + resendOrders.length}</span>
               </div>
-              
-              {productionOrders.length > 0 ? (
+
+              {(productionOrders.length > 0 || resendOrders.length > 0) ? (
                 <div className="space-y-1.5">
+                  {/* 补发单置顶：总部批准后空降，无需手动接单 */}
+                  {resendOrders.map(order => (
+                    <div
+                      key={`resend-${order.id}`}
+                      className="px-2.5 py-2 rounded-lg bg-primary/10 border border-primary/40"
+                      style={{ boxShadow: "0 0 16px hsl(270 100% 65% / 0.18)" }}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className="font-mono text-lg font-bold text-foreground">
+                              #{order.id} <span className="text-primary">(补发单)</span>
+                            </span>
+                            <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-1.5 py-0 h-4 gap-0.5">
+                              <Zap className="w-2.5 h-2.5" />
+                              {resendLabel(order.liability)}
+                            </Badge>
+                            <span className="flex items-center gap-0.5 text-[10px] text-primary">
+                              <Printer className="w-3 h-3" />
+                              已自动出票
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+                            {formatItems(order.items).map((item, i) => (
+                              <span key={i} className="text-sm font-medium text-foreground">{item}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <Badge className="px-2.5 py-1 text-xs shrink-0 bg-primary/80 text-primary-foreground border-primary/80">
+                          制作中
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-muted-foreground mt-1.5 pt-1.5 border-t border-primary/20">
+                        {resendNote(order.liability)}
+                      </p>
+                    </div>
+                  ))}
                   {productionOrders.map(order => (
+
                     order.status === "ready" ? (
                       <SwipeableOrderCard
                         key={order.id}
