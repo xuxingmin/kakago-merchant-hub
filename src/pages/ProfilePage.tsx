@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useOnboarding } from "@/contexts/OnboardingContext";
+import { hasPendingComplaintAppeal } from "./ComplaintsPage";
 
 const announcements = [
   "[系统通知] 财务自动结算链路已升级",
