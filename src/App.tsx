@@ -14,6 +14,7 @@ import InventoryPage from "./pages/InventoryPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettlementPage from "./pages/SettlementPage";
 import InvoicePage from "./pages/InvoicePage";
+import ComplaintsPage from "./pages/ComplaintsPage";
 import SigningChamber from "./pages/SigningChamber";
 import NotFound from "./pages/NotFound";
 
