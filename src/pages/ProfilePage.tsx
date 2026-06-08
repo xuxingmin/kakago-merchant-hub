@@ -229,6 +229,15 @@ const ProfilePage = () => {
           onClick={() => navigate("/invoice")}
           locked={reviewLocked}
         />
+        <div className="mx-3 h-px bg-border/40" />
+        <MenuItem
+          icon={ScrollText}
+          label="客诉违规记录"
+          sub="查看扣款处罚与发起申诉"
+          onClick={() => navigate("/complaints")}
+          badge={hasPendingComplaintAppeal()}
+          locked={reviewLocked}
+        />
       </Card>
 
       {/* === Menu Group 2: Store Management === */}
