@@ -79,7 +79,7 @@ const OnboardingGate = () => {
             </div>
             <div className="mb-2 flex items-center gap-2 text-primary">
               <Coffee className="h-4 w-4" />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.3em]">KAKAGO</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.3em]">TRIVA</span>
             </div>
             <h2 className="mb-3 text-xl font-bold text-foreground">合同签署成功</h2>
             <p className="max-w-[260px] text-[13px] leading-relaxed text-muted-foreground">

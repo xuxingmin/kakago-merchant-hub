@@ -68,7 +68,7 @@ const SmartSupplyChainWidget = ({
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-muted-foreground" />
           <div>
-            <p className="text-xs font-bold text-muted-foreground">KAKAGO</p>
+            <p className="text-xs font-bold text-muted-foreground">TRIVA</p>
             <p className="text-[10px] text-muted-foreground/60">智能供应链系统</p>
           </div>
         </div>
@@ -93,7 +93,7 @@ const SmartSupplyChainWidget = ({
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary" />
           <div>
-            <p className="text-xs font-bold text-foreground">KAKAGO</p>
+            <p className="text-xs font-bold text-foreground">TRIVA</p>
             <p className="text-[10px] text-primary">
               智能补货 · 约{estimatedDays}天后达
             </p>

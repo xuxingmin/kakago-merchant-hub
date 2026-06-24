@@ -84,7 +84,7 @@ const ProfilePage = () => {
   }, []);
 
   const userInfo = {
-    storeName: "KAKAGO 中关村店",
+    storeName: "TRIVA 中关村店",
     role: "店主/咖啡师",
     merchantId: "MCH-88012",
     totalEarnings: 128600,
@@ -263,7 +263,7 @@ const ProfilePage = () => {
       </Card>
 
       <p className="text-center text-[11px] text-muted-foreground pt-1">
-        KAKAGO v1.0.0
+        TRIVA v1.0.0
       </p>
 
       {/* 经营须知 Sheet */}
@@ -371,7 +371,7 @@ const ProfilePage = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Join KAKAGO Sheet */}
+      {/* Join TRIVA Sheet */}
       <Sheet open={showJoinDialog} onOpenChange={setShowJoinDialog}>
         <SheetContent side="bottom" className="bg-background border-t border-border h-[90vh]">
           <div className="overflow-y-auto max-h-[calc(90vh-20px)] pb-6">
@@ -379,7 +379,7 @@ const ProfilePage = () => {
               <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-1.5">
                 <Coffee className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="text-[17px] font-bold text-foreground mb-0.5">接入 KAKAGO 咖啡网络</h2>
+              <h2 className="text-[17px] font-bold text-foreground mb-0.5">接入 TRIVA 咖啡网络</h2>
               <p className="text-[13px] text-muted-foreground leading-snug max-w-[300px] mx-auto">
                 让闲置产能变现，成为全城精品咖啡基础设施。
               </p>
@@ -414,7 +414,7 @@ const ProfilePage = () => {
             <div className="mt-4 space-y-2">
               <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/10 border border-primary/30">
                 <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-0.5 accent-primary" />
-                <p className="text-[11px] text-muted-foreground">我已阅读并同意《KAKAGO合作商户协议》和《数据保护条款》</p>
+                <p className="text-[11px] text-muted-foreground">我已阅读并同意《TRIVA合作商户协议》和《数据保护条款》</p>
               </div>
               <Button className="w-full bg-primary" disabled={!agreedToTerms} onClick={() => { alert("申请已提交，我们将尽快与您联系！"); setShowJoinDialog(false); }}>
                 <Coffee className="w-4 h-4 mr-1" />
