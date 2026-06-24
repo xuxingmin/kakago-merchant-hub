@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 const announcements = [
   {
     id: 1, tag: "[系统通知]", title: "财务自动结算链路已升级", date: "2026-02-22",
-    content: "为了提升商户资金周转效率，本周起 KAKAGO 已全面升级为全自动周结算模式。每周五系统将自动打款至您的绑定账户，无需手动操作提现。请前往「结算管理」查看账单明细。",
+    content: "为了提升商户资金周转效率，本周起 TRIVA 已全面升级为全自动周结算模式。每周五系统将自动打款至您的绑定账户，无需手动操作提现。请前往「结算管理」查看账单明细。",
   },
   {
     id: 2, tag: "[运营战报]", title: "合肥蜀山测试店周日出杯量突破300杯", date: "2026-02-21",
@@ -26,7 +26,7 @@ const announcements = [
   },
   {
     id: 6, tag: "[运营战报]", title: "全国门店总出杯量突破50万杯", date: "2026-02-17",
-    content: "截至本周，KAKAGO 全国合作门店累计出杯量已突破 50 万杯，感谢每一位合作伙伴的努力与坚持！",
+    content: "截至本周，TRIVA 全国合作门店累计出杯量已突破 50 万杯，感谢每一位合作伙伴的努力与坚持！",
   },
 ];
 
@@ -60,7 +60,7 @@ const MerchantBanner = ({ showBroadcast = false }: { showBroadcast?: boolean }) 
         {/* Top row: store info + switch */}
         <div className="flex items-center px-4 py-1.5">
           <span className="text-base font-bold text-muted-foreground mr-4 shrink-0">
-            KAKAGO
+            TRIVA
           </span>
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-medium text-foreground">中关村店</span>

@@ -321,7 +321,7 @@ const DataPage = () => {
                 {/* Explanation box */}
                 <div className="mt-3 p-3 rounded-xl bg-secondary/40 border border-border/30">
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    【KAKAGO 自动结算规则】本平台实行全自动「周结算」模式。账期为每周五 00:00 至周四 24:00（共7天，首周按实际营业天数折算）。系统于每周五（T+1）自动打款至您入驻时绑定的结算账户，通常于当日 18:00 前到账。资金全自动流转，无需手动提现。如需变更收款账户，请于每周三 18:00 前在「我的 - 资金账户管理」提交申请。
+                    【TRIVA 自动结算规则】本平台实行全自动「周结算」模式。账期为每周五 00:00 至周四 24:00（共7天，首周按实际营业天数折算）。系统于每周五（T+1）自动打款至您入驻时绑定的结算账户，通常于当日 18:00 前到账。资金全自动流转，无需手动提现。如需变更收款账户，请于每周三 18:00 前在「我的 - 资金账户管理」提交申请。
                   </p>
                 </div>
               </div>
@@ -363,7 +363,7 @@ const DataPage = () => {
             </div>
             <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-secondary/30">
               <span className="text-xs text-muted-foreground">打款账户</span>
-              <span className="text-xs font-medium text-foreground">KAKAGO 绑定账户 (尾号 8888)</span>
+              <span className="text-xs font-medium text-foreground">TRIVA 绑定账户 (尾号 8888)</span>
             </div>
           </div>
           <DialogFooter className="flex gap-2 sm:gap-2">
